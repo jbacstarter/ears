@@ -4,7 +4,7 @@ const UserRegInfo = async (req, res) =>{
 
     try {
     const db = getDB();
-        const courses = await db.collection('courses').find().toArray();
+        const courses = await db.collection('courselist').find().toArray();
         const list =[];
         for(let i = 0; i < courses.length; i++) {
             const {_id, ...rest} = courses[i];

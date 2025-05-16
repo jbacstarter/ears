@@ -1,4 +1,5 @@
 import { AccountInfo, GetCourse, GetCourseList } from "../Utilities/api.js";
+import QuizTimer from "../Utilities/QuizTimer.js";
 import { logout } from "./logout.js";
 import { modules, shome, sprofile } from "./static.js";
 
@@ -149,9 +150,10 @@ tm.addEventListener("click", async (e) =>{
             </main>
             
 */
+
+
 const showCourse = async (courseTitle) => {
     const info = await GetCourse(getUser(), courseTitle);
-    console.log(info)
     const parent =  document.querySelector('.main-content-area');
     const oldContent = document.querySelector(".main-content-area main");
     if (oldContent) {
@@ -174,6 +176,10 @@ const showCourse = async (courseTitle) => {
         const title = document.createElement("h4");
         mCard.classList.add("module_card");
         title.textContent = info.result.modules[i].title
+        title.addEventListener("click", (e) =>{
+            showModule(info, i);
+        })
+        
         mCard.appendChild(title);
         content.appendChild(mCard);
     }
@@ -198,8 +204,119 @@ const showCourse = async (courseTitle) => {
         qCard.appendChild(title);
         qCard.append(score);
         content.appendChild(qCard);
+
+        title.addEventListener("click", (e) =>{
+        const quiz = info.result.quizzes[i];
+        const parent =  document.querySelector('.main-content-area');
+        const oldContent = document.querySelector(".main-content-area main");   
+        if (oldContent) {
+            parent.removeChild(oldContent);
+        }   
+        const main = document.createElement("main");
+        main.classList.add("quiz-container");
+        const quizHeader = document.createElement("div");
+        quizHeader.classList.add("quiz-header");
+        const quizTitle = document.createElement("h1")
+        quizTitle.textContent = quiz.title;   
+        quizHeader.appendChild(quizTitle);
+        const quizMeta = document.createElement("div"); // Append this child
+        const quizTimer =document.createElement("span");
+        quizTimer.classList.add("quiz-timer");
+        quizTimer.innerHTML +=
+        `
+        <i class="fas fa-clock"></i> Time remaining: 
+        `
+        const displayElement = document.createElement("span");
+        displayElement.setAttribute("id", "time-display");
+        const quizT = new QuizTimer(quiz.timeLimit/60, displayElement);
+        quizTimer.appendChild(displayElement);
+        quizT.start();
+        quizMeta.appendChild(quizTimer);
+        quizHeader.appendChild(quizMeta);
+        main.appendChild(quizHeader);
+        
+        const quizQS = document.createElement("div");
+        // Quiz Q Children
+        const qs = quiz.questions;
+        for(let numQ = 0; numQ < qs.length; numQ++){
+            
+            const quesH = document.createElement("div");
+            const quizQ = document.createElement("div");
+            quesH.innerHTML += `<h2>Question ${numQ+1}</h2>`;
+            quizQ.appendChild(quesH);
+            quizQ.innerHTML +=
+            `
+            <div class="question-text">
+            <p>${qs[numQ].problem}</p>
+            </div>
+            `
+        const aos = document.createElement("div");
+        aos.classList.add("answer-options");
+        
+        for(let numCh = 0; numCh < qs[numQ].choices.length; numCh++){
+        const ao= document.createElement("div")
+        ao.classList.add("answer-option");
+        const radio = document.createElement("input");
+        radio.setAttribute("type", "radio");
+        radio.setAttribute("id", `q${numQ+1}-option${numQ+1}`);
+        radio.setAttribute("name", `q${numQ+1}`);
+        radio.classList.add("answer-radio")
+        const label = document.createElement("label");
+        label.setAttribute("for", `q${numQ+1}-option${numQ+1}`)
+        label.classList.add("answer-label");
+        label.innerHTML +=
+        `
+        <span class="option-letter">${String.fromCharCode(numCh+65)}</span>
+        <span class="option-text">${qs[numQ].choices[numCh]}</span>
+        `
+        ao.appendChild(radio);
+        ao.appendChild(label);
+
+        aos.appendChild(ao)
+        }
+
+        quizQS.appendChild(quizQ);
+        quizQS.appendChild(aos);
+        }
+        //Append questions
+        main.appendChild(quizQS);
+        
+        //Append footer & submit button
+        const footer = document.createElement("div");
+        footer.classList.add("quiz-footer");
+        const submitBtn = document.createElement("button");
+        submitBtn.classList.add("submit-button");
+        submitBtn.textContent = "Submit Assessment";
+        footer.appendChild(submitBtn);
+        main.appendChild(footer);
+
+        //Append parent
+        parent.appendChild(main);
+        
+        })
     }
 
     parent.appendChild(content);
+
+}
+
+const showModule = (info, index) => {
+            const parent =  document.querySelector('.main-content-area');
+            const oldContent = document.querySelector(".main-content-area main");   
+            if (oldContent) {
+            parent.removeChild(oldContent);
+            }   
+            const moduleBody = document.createElement("main");
+            moduleBody.classList.add("module-information");
+            const title = document.createElement("h1");
+            const body = document.createElement("p");
+            body.textContent = info.result.modules[index].body;
+            title.textContent = info.result.modules[index].title;
+            moduleBody.appendChild(title)
+            moduleBody.appendChild(body)
+            parent.appendChild(moduleBody);
+}
+
+const showQuiz = (info, index) => {
 
 }

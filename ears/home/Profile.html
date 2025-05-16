@@ -58,27 +58,70 @@
         </div>
       </header>
 
-      <main class="content">
-        <h1>User Profile</h1>
-
-        <section class="profile-section">
-          <div class="profile-card">
-            <h2>Account Information</h2>
-            <div class="profile-info">
-              <p id="name"><strong>Name:</strong> John</p>
-              <p id="email"><strong>Email:</strong> 23101961@usc.edu.ph</p>
-              <p id="gender"><strong>Gender:</strong> Male</p>
-              <p id="address"><strong>Address:</strong> Mactan Plains Residences</p>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer>
-        <p>&copy; 2025 EARS</p>
-      </footer>
+<main class="quiz-container">
+  <div class="quiz-header">
+    <h1>Workplace Safety Assessment</h1>
+    <div class="quiz-meta">
+      <span class="quiz-timer"><i class="fas fa-clock"></i> Time remaining: <span id="time-display">25:00</span></span>
+      <span class="quiz-progress">10 Questions</span>
     </div>
   </div>
+
+  <div class="quiz-questions">
+    <!-- Question 1 -->
+    <div class="quiz-question">
+      <div class="question-header">
+        <h2>Question 1</h2>
+        <button class="flag-button"><i class="far fa-flag"></i></button>
+      </div>
+      <div class="question-text">
+        <p>Which of the following is the correct procedure when discovering a fire in the workplace?</p>
+      </div>
+      <div class="answer-options">  
+        <div class="answer-option">
+          <input type="radio" id="q1-option1" name="q1" class="answer-radio">
+          <label for="q1-option1" class="answer-label">
+            <span class="option-letter">A</span>
+            <span class="option-text">Attempt to put out the fire yourself immediately</span>
+          </label>
+        </div>
+        <div class="answer-option">
+          <input type="radio" id="q1-option2" name="q1" class="answer-radio">
+          <label for="q1-option2" class="answer-label">
+            <span class="option-letter">B</span>
+            <span class="option-text">Activate the nearest fire alarm and evacuate</span>
+          </label>
+        </div>
+        <div class="answer-option">
+          <input type="radio" id="q1-option3" name="q1" class="answer-radio">
+          <label for="q1-option3" class="answer-label">
+            <span class="option-letter">C</span>
+            <span class="option-text">Continue working until instructed otherwise</span>
+          </label>
+        </div>
+        <div class="answer-option">
+          <input type="radio" id="q1-option4" name="q1" class="answer-radio">
+          <label for="q1-option4" class="answer-label">
+            <span class="option-letter">D</span>
+            <span class="option-text">Call your supervisor and wait for instructions</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional questions would follow the same pattern -->
+    
+  </div>
+
+  <div class="quiz-footer">
+    <button class="submit-button">
+      Submit Assessment
+    </button>
+  </div>
+</main>
+
+    </div>
+  </div> 
 <script type="module" src="General.js"></script>
 </body>
 </html>
