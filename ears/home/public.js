@@ -206,7 +206,34 @@ const showCourse = async (courseTitle) => {
         content.appendChild(qCard);
 
         title.addEventListener("click", (e) =>{
-        const quiz = info.result.quizzes[i];
+            showQuiz(info,i)
+        
+        })
+    }
+
+    parent.appendChild(content);
+
+}
+
+const showModule = (info, index) => {
+            const parent =  document.querySelector('.main-content-area');
+            const oldContent = document.querySelector(".main-content-area main");   
+            if (oldContent) {
+            parent.removeChild(oldContent);
+            }   
+            const moduleBody = document.createElement("main");
+            moduleBody.classList.add("module-information");
+            const title = document.createElement("h1");
+            const body = document.createElement("p");
+            body.textContent = info.result.modules[index].body;
+            title.textContent = info.result.modules[index].title;
+            moduleBody.appendChild(title)
+            moduleBody.appendChild(body)
+            parent.appendChild(moduleBody);
+}
+
+const showQuiz = (info,index ) => {
+        const quiz = info.result.quizzes[index];
         const parent =  document.querySelector('.main-content-area');
         const oldContent = document.querySelector(".main-content-area main");   
         if (oldContent) {
@@ -292,31 +319,4 @@ const showCourse = async (courseTitle) => {
 
         //Append parent
         parent.appendChild(main);
-        
-        })
-    }
-
-    parent.appendChild(content);
-
-}
-
-const showModule = (info, index) => {
-            const parent =  document.querySelector('.main-content-area');
-            const oldContent = document.querySelector(".main-content-area main");   
-            if (oldContent) {
-            parent.removeChild(oldContent);
-            }   
-            const moduleBody = document.createElement("main");
-            moduleBody.classList.add("module-information");
-            const title = document.createElement("h1");
-            const body = document.createElement("p");
-            body.textContent = info.result.modules[index].body;
-            title.textContent = info.result.modules[index].title;
-            moduleBody.appendChild(title)
-            moduleBody.appendChild(body)
-            parent.appendChild(moduleBody);
-}
-
-const showQuiz = (info, index) => {
-
 }
