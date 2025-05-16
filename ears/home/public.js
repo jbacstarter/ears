@@ -1,4 +1,5 @@
-import { AccountInfo, GetCourse, GetCourseList } from "../Utilities/api.js";
+import { AccountInfo, GetCourse, GetCourseList, UpdateScore } from "../Utilities/api.js";
+import { checkAnswers } from "../Utilities/checkAnswers.js";
 import QuizTimer from "../Utilities/QuizTimer.js";
 import { logout } from "./logout.js";
 import { modules, shome, sprofile } from "./static.js";
@@ -197,10 +198,10 @@ const showCourse = async (courseTitle) => {
         const title = document.createElement("h4");
         const score = document.createElement("p");
         qCard.classList.add("quiz_card");
-        title.textContent = info.result.modules[i].title;
+        title.textContent = info.result.quizzes[i].title;
         const nscore =info.result.quizzes[i].score;
         const maxScore = info.result.quizzes[i].maxScore;
-        score.textContent = nscore > 0 ? `Score: ${nscore}/${maxScore}`: `Score: ${maxScore}/${maxScore}`
+        score.textContent = (info.result.quizzes[i].status ? "(Closed)  " : "(Open)  ") + (nscore > 0 ? `Score: ${nscore}/${maxScore}`: `Score: ${maxScore}/${maxScore}`);
         qCard.appendChild(title);
         qCard.append(score);
         content.appendChild(qCard);
@@ -232,8 +233,9 @@ const showModule = (info, index) => {
             parent.appendChild(moduleBody);
 }
 
-const showQuiz = (info,index ) => {
+const showQuiz = (info,index) => {
         const quiz = info.result.quizzes[index];
+        if(!quiz.status){
         const parent =  document.querySelector('.main-content-area');
         const oldContent = document.querySelector(".main-content-area main");   
         if (oldContent) {
@@ -265,8 +267,10 @@ const showQuiz = (info,index ) => {
         const quizQS = document.createElement("div");
         // Quiz Q Children
         const qs = quiz.questions;
+        const answerList = []; // Store user answers
+        const answers = [];
         for(let numQ = 0; numQ < qs.length; numQ++){
-            
+            answers.push(qs[numQ].answer);
             const quesH = document.createElement("div");
             const quizQ = document.createElement("div");
             quesH.innerHTML += `<h2>Question ${numQ+1}</h2>`;
@@ -277,46 +281,59 @@ const showQuiz = (info,index ) => {
             <p>${qs[numQ].problem}</p>
             </div>
             `
-        const aos = document.createElement("div");
-        aos.classList.add("answer-options");
-        
-        for(let numCh = 0; numCh < qs[numQ].choices.length; numCh++){
-        const ao= document.createElement("div")
-        ao.classList.add("answer-option");
-        const radio = document.createElement("input");
-        radio.setAttribute("type", "radio");
-        radio.setAttribute("id", `q${numQ+1}-option${numQ+1}`);
-        radio.setAttribute("name", `q${numQ+1}`);
-        radio.classList.add("answer-radio")
-        const label = document.createElement("label");
-        label.setAttribute("for", `q${numQ+1}-option${numQ+1}`)
-        label.classList.add("answer-label");
-        label.innerHTML +=
-        `
-        <span class="option-letter">${String.fromCharCode(numCh+65)}</span>
-        <span class="option-text">${qs[numQ].choices[numCh]}</span>
-        `
-        ao.appendChild(radio);
-        ao.appendChild(label);
+            const aos = document.createElement("div");
+            aos.classList.add("answer-options");
+            for(let numCh = 0; numCh < qs[numQ].choices.length; numCh++){
+            
+            const ao= document.createElement("div")
+            ao.classList.add("answer-option");
+            const radio = document.createElement("input");
+            radio.setAttribute("type", "radio");
+            radio.setAttribute("id", `q${numQ+1}-option${numCh+1}`);
+            radio.setAttribute("name", `q${numQ+1}`);
+            radio.classList.add("answer-radio")
+            radio.addEventListener("click", ()=>{
+                answerList.push(qs[numQ].choices[numCh]);
+            })
+            const label = document.createElement("label");
+            label.setAttribute("for", `q${numQ+1}-option${numCh+1}`)
+            label.classList.add("answer-label");
+            label.innerHTML +=
+            `
+            <span class="option-letter">${String.fromCharCode(numCh+65)}</span>
+            <span class="option-text">${qs[numQ].choices[numCh]}</span>
+            `
+            ao.appendChild(radio);
+            ao.appendChild(label);
 
-        aos.appendChild(ao)
+            aos.appendChild(ao)
+            }
+
+            quizQS.appendChild(quizQ);
+            quizQS.appendChild(aos);
+            }
+            //Append questions
+            main.appendChild(quizQS);
+
+            //Append footer & submit button
+            const footer = document.createElement("div");
+            footer.classList.add("quiz-footer");
+            const submitBtn = document.createElement("button");
+            submitBtn.classList.add("submit-button");
+            submitBtn.textContent = "Submit Assessment"; 
+            submitBtn.addEventListener("click", (e) =>{
+                const res =  checkAnswers( answers, answerList);
+                submitQuiz(getUser(), info.result.title, info.result.quizzes[index].title,res);
+            })
+            footer.appendChild(submitBtn);
+            main.appendChild(footer);
+
+            // Append parent
+            parent.appendChild(main);
         }
+}
 
-        quizQS.appendChild(quizQ);
-        quizQS.appendChild(aos);
-        }
-        //Append questions
-        main.appendChild(quizQS);
-        
-        //Append footer & submit button
-        const footer = document.createElement("div");
-        footer.classList.add("quiz-footer");
-        const submitBtn = document.createElement("button");
-        submitBtn.classList.add("submit-button");
-        submitBtn.textContent = "Submit Assessment";
-        footer.appendChild(submitBtn);
-        main.appendChild(footer);
-
-        //Append parent
-        parent.appendChild(main);
+const submitQuiz = (user, courseTitle, quizTitle, newScore) =>{
+              UpdateScore(user, courseTitle, quizTitle,newScore);
+              updateDashboard();
 }

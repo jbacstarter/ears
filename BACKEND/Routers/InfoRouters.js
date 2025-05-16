@@ -7,6 +7,7 @@ const { UserGender } = require("../Controllers/UserGender");
 const { UserInfo } = require("../Controllers/UserInfo");
 const { UserName } = require("../Controllers/UserName");
 const { UserRegInfo } = require("../Controllers/UserRegInfo");
+const { UserScore } = require("../Controllers/UserScore");
 const InfoRouter = require("express").Router();
 
 
@@ -18,6 +19,7 @@ InfoRouter.get("/info/addr", UserAddress);
 InfoRouter.get("/info/mcomp", UserCompleted);
 InfoRouter.get("/info/course", UserCourse);
 InfoRouter.get("/info/courselist", UserCourseList);
+InfoRouter.get("/info/newScore", UserScore);
 InfoRouter.post("/info/create", UserRegInfo);
 
 module.exports = {InfoRouter};

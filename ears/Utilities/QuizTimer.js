@@ -61,7 +61,7 @@ export default class QuizTimer {
     warning.className = 'time-up-warning';
     warning.innerHTML = `
       <i class="fas fa-exclamation-triangle"></i>
-      Time's up! Your answers have been submitted automatically.
+      Time's up! Your answers will be submitted automatically.
     `;
     document.querySelector('.quiz-header').appendChild(warning);
     

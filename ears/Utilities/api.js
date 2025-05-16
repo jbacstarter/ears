@@ -143,3 +143,19 @@ export const GetCourseList = async () =>{
   }
   return details;
 }
+
+
+export const UpdateScore = async (user, courseTitle, quizTitle, newScore) =>{
+
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+ 
+  const requestOptions = {
+    method: "GET",
+    headers: myHeaders,
+    redirect: "follow"
+  };
+    const response = await fetch(`${HOST}/ears/info/newScore?email=${user}&courseTitle=${courseTitle}&quizTitle=${quizTitle}&newScore=${newScore}`, requestOptions);
+    const res = await response.json();
+  return res.status;
+}
