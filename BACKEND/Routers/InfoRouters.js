@@ -1,3 +1,5 @@
+const { addModuleByTitle } = require("../Controllers/AddModule");
+const { removeModuleByTitle } = require("../Controllers/RemoveModule");
 const { UserAddress } = require("../Controllers/UserAddress");
 const { UserAverage } = require("../Controllers/UserAverage");
 const { UserCompleted } = require("../Controllers/UserCompleted");
@@ -21,5 +23,8 @@ InfoRouter.get("/info/course", UserCourse);
 InfoRouter.get("/info/courselist", UserCourseList);
 InfoRouter.get("/info/newScore", UserScore);
 InfoRouter.post("/info/create", UserRegInfo);
+InfoRouter.post("/info/courses/:courseTitle/modules", addModuleByTitle);
+InfoRouter.delete("/info/courses/:courseTitle/modules/:moduleTitle", removeModuleByTitle);
+
 
 module.exports = {InfoRouter};

@@ -104,10 +104,10 @@ export const initAccount = async (user) =>{
 }
 
 export const GetCourse = async (user, courseTitle) =>{
-    const details ={};
+  const details ={};
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
- 
+  
   const requestOptions = {
     method: "GET",
     headers: myHeaders,
@@ -119,16 +119,16 @@ export const GetCourse = async (user, courseTitle) =>{
   } catch (error) {
     details.result = 0
   }
-
+  
   return details;
 }
 
 
 export const GetCourseList = async () =>{
-    const details ={};
+  const details ={};
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
- 
+  
   const requestOptions = {
     method: "GET",
     headers: myHeaders,
@@ -146,16 +146,59 @@ export const GetCourseList = async () =>{
 
 
 export const UpdateScore = async (user, courseTitle, quizTitle, newScore) =>{
-
+  
   const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
- 
+  
   const requestOptions = {
     method: "GET",
     headers: myHeaders,
     redirect: "follow"
   };
-    const response = await fetch(`${HOST}/ears/info/newScore?email=${user}&courseTitle=${courseTitle}&quizTitle=${quizTitle}&newScore=${newScore}`, requestOptions);
-    const res = await response.json();
+  const response = await fetch(`${HOST}/ears/info/newScore?email=${user}&courseTitle=${courseTitle}&quizTitle=${quizTitle}&newScore=${newScore}`, requestOptions);
+  const res = await response.json();
   return res.status;
 }
+
+export const addModule = async (data) =>{
+  const details ={};
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+  const raw = JSON.stringify({
+    "title": data.title,
+    "body": data.body
+  });
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow"
+  };
+  
+  try {
+    const response = await fetch(`${HOST}/ears/info/courses/${data.courseTitle}/modules`, requestOptions);
+    const text = await response.json();
+    return text.status;
+  } catch (error) {
+    console.log(error);
+  }
+}
+export const removeModule = async (data) =>{
+  const details ={};
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+  const requestOptions = {
+    method: "DELETE",
+    headers: myHeaders,
+    redirect: "follow"
+  };
+  
+  try {
+    const response = await fetch(`${HOST}/ears/info/courses/${data.courseTitle}/modules/${data.moduleTitle}`, requestOptions);
+    const text = await response.json();
+    return text.status;
+  } catch (error) {
+    console.log(error);
+  }
+}
+

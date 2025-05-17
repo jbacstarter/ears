@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - EARS</title>
+    <title>Quiz Management - EARS Admin</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         /* Enhanced Admin Styles */
         body {
@@ -77,7 +78,7 @@
             padding: 2rem;
         }
         
-        .course-management {
+        .quiz-management {
             background-color: white;
             border-radius: 8px;
             padding: 2rem;
@@ -97,7 +98,7 @@
             margin-bottom: 1rem;
         }
         
-        .module-actions {
+        .quiz-actions {
             display: flex;
             gap: 1rem;
             margin-bottom: 2rem;
@@ -130,13 +131,22 @@
             background-color: #c0392b;
         }
         
-        .module-list {
+        .edit-button {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .edit-button:hover {
+            background-color: #2980b9;
+        }
+        
+        .quiz-list {
             border: 1px solid #eee;
             border-radius: 4px;
             overflow: hidden;
         }
         
-        .module-item {
+        .quiz-item {
             padding: 1rem;
             border-bottom: 1px solid #eee;
             display: flex;
@@ -144,19 +154,31 @@
             align-items: center;
         }
         
-        .module-item:last-child {
+        .quiz-item:last-child {
             border-bottom: none;
         }
         
-        .module-info h3 {
+        .quiz-info h3 {
             margin: 0 0 0.5rem 0;
             color: #2c3e50;
         }
         
-        .module-info p {
+        .quiz-info p {
             margin: 0;
             color: #7f8c8d;
             font-size: 0.9rem;
+        }
+        
+        .quiz-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .quiz-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
         }
         
         /* Modal Styles */
@@ -178,7 +200,9 @@
             padding: 2rem;
             border-radius: 8px;
             width: 100%;
-            max-width: 500px;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         .modal-header {
@@ -211,7 +235,8 @@
         }
         
         .form-group input,
-        .form-group textarea {
+        .form-group textarea,
+        .form-group select {
             width: 100%;
             padding: 0.8rem;
             border: 1px solid #ddd;
@@ -228,6 +253,7 @@
             display: flex;
             justify-content: flex-end;
             gap: 1rem;
+            margin-top: 2rem;
         }
         
         .cancel-button {
@@ -247,6 +273,79 @@
         .submit-button:hover {
             background-color: #2980b9;
         }
+        
+        /* Question Management Styles */
+        .question-list {
+            margin-top: 2rem;
+            border-top: 1px solid #eee;
+            padding-top: 1rem;
+        }
+        
+        .question-item {
+            background-color: #f9f9f9;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        
+        .question-item h4 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+        }
+        
+        .question-choices {
+            padding-left: 1.5rem;
+        }
+        
+        .question-choices li {
+            margin-bottom: 0.3rem;
+        }
+        
+        .correct-answer {
+            font-weight: bold;
+            color: #2ecc71;
+        }
+        
+        .question-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .question-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .question-actions button:hover {
+            color: #3498db;
+        }
+        
+        .add-question-btn {
+            margin-top: 1rem;
+            background-color: #f1c40f;
+            color: white;
+        }
+        
+        .add-question-btn:hover {
+            background-color: #f39c12;
+        }
+        
+        .time-input {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .time-input input {
+            width: 60px;
+        }
     </style>
 </head>
 <body>
@@ -261,16 +360,16 @@
         <aside id="management-links">
             <h2>Management</h2>
             <ul>
-                <li><a href="#modules" class="active">Manage Modules</a></li>
-                <li><a href="#quizzes">Manage Quizzes</a></li>
+                <li><a href="#modules">Manage Modules</a></li>
+                <li><a href="#quizzes" class="active">Manage Quizzes</a></li>
                 <li><a href="#users">Manage Users</a></li>
                 <li><a href="#reports">View Reports</a></li>
             </ul>
         </aside>
 
         <section id="content-area">
-            <div class="course-management">
-                <h2>Course Module Management</h2>
+            <div class="quiz-management">
+                <h2>Quiz Management</h2>
                 
                 <div class="course-selector">
                     <label for="course-select">Select Course:</label>
@@ -279,45 +378,101 @@
                     </select>
                 </div>
                 
-                <div class="module-actions">
-                    <button class="action-button add-button" id="add-module-btn">Add Module</button>
-                    <button class="action-button remove-button" id="remove-module-btn">Remove Module</button>
+                <div class="quiz-actions">
+                    <button class="action-button add-button" id="add-quiz-btn">Add Quiz</button>
+                    <button class="action-button remove-button" id="remove-quiz-btn">Remove Quiz</button>
                 </div>
                 
-                <div class="module-list" id="module-list">
-                    <!-- Modules will be loaded here -->
+                <div class="quiz-list" id="quiz-list">
+                    <!-- Quizzes will be loaded here -->
                     <div class="placeholder-message">
-                        <p>Select a course to view or manage its modules.</p>
+                        <p>Select a course to view or manage its quizzes.</p>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- Add Module Modal -->
-    <div class="modal" id="add-module-modal">
+    <!-- Add Quiz Modal -->
+    <div class="modal" id="quiz-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Add New Module</h2>
+                <h2 id="quiz-modal-title">Add New Quiz</h2>
                 <button class="close-button">&times;</button>
             </div>
-            <form id="module-form">
+            <form id="quiz-form">
                 <div class="form-group">
-                    <label for="module-title">Module Title:</label>
-                    <input type="text" id="module-title" required>
+                    <label for="quiz-title">Quiz Title:</label>
+                    <input type="text" id="quiz-title" required>
                 </div>
+                
                 <div class="form-group">
-                    <label for="module-content">Module Content:</label>
-                    <textarea id="module-content" required></textarea>
+                    <label for="quiz-time">Time Limit (minutes):</label>
+                    <div class="time-input">
+                        <input type="number" id="quiz-time" min="1" value="5" required>
+                        <span>minutes</span>
+                    </div>
                 </div>
+                
+                <div class="question-list" id="question-list">
+                    <!-- Questions will be added here -->
+                </div>
+                
+                <button type="button" class="action-button add-question-btn" id="add-question-btn">Add Question</button>
+                
                 <div class="modal-actions">
-                    <button type="button" class="action-button cancel-button" id="cancel-add">Cancel</button>
-                    <button type="submit" class="action-button submit-button">Add Module</button>
+                    <button type="button" class="action-button cancel-button" id="cancel-quiz">Cancel</button>
+                    <button type="submit" class="action-button submit-button">Save Quiz</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <script type="module" src="./adm.js"></script>
+    <!-- Question Modal -->
+    <div class="modal" id="question-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="question-modal-title">Add Question</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <form id="question-form">
+                <div class="form-group">
+                    <label for="question-text">Question:</label>
+                    <input type="text" id="question-text" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Choices:</label>
+                    <div class="choice-input" style="margin-bottom: 0.5rem;">
+                        <input type="text" class="choice-text" placeholder="Choice 1" required>
+                        <input type="radio" name="correct-choice" value="0" required>
+                        <label>Correct</label>
+                    </div>
+                    <div class="choice-input" style="margin-bottom: 0.5rem;">
+                        <input type="text" class="choice-text" placeholder="Choice 2" required>
+                        <input type="radio" name="correct-choice" value="1">
+                        <label>Correct</label>
+                    </div>
+                    <div class="choice-input" style="margin-bottom: 0.5rem;">
+                        <input type="text" class="choice-text" placeholder="Choice 3" required>
+                        <input type="radio" name="correct-choice" value="2">
+                        <label>Correct</label>
+                    </div>
+                    <div class="choice-input" style="margin-bottom: 0.5rem;">
+                        <input type="text" class="choice-text" placeholder="Choice 4" required>
+                        <input type="radio" name="correct-choice" value="3">
+                        <label>Correct</label>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="action-button cancel-button" id="cancel-question">Cancel</button>
+                    <button type="submit" class="action-button submit-button">Save Question</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="./quiz-admin.js"></script>
 </body>
 </html>
