@@ -356,6 +356,12 @@
 .edit-button:hover {
     background-color: #2980b9;
 }
+.li-module:hover{
+    cursor: pointer;
+}
+.li-quiz:hover{
+cursor: pointer;
+}
     </style>
 </head>
 <body>
@@ -370,10 +376,8 @@
         <aside id="management-links">
             <h2>Management</h2>
             <ul>
-                <li><a href="./modules.html">Manage Modules</a></li>
-                <li><a href="./quiz.html" class="active">Manage Quizzes</a></li>
-                <li><a href="#users">Manage Users</a></li>
-                <li><a href="#reports">View Reports</a></li>
+                <li><a class="li-module">Manage Modules</a></li>
+                <li><a  class="li-quiz active">Manage Quizzes</a></li>
             </ul>
         </aside>
 
@@ -482,7 +486,13 @@
             </form>
         </div>
     </div>
-
+        <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p class="loading-text">Loading...</p>
+    </div>
+    </div>
+    <div id="notificationContainer" class="notification-container"></div>
     <script type="module" src="./quiz-admin.js"></script>
 </body>
 </html>

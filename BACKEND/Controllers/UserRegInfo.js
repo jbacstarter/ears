@@ -14,10 +14,7 @@ const UserRegInfo = async (req, res) =>{
         email: req.body.email,
         name: req.body.name || "Tom",
         gender: "Male",
-        address: "N/A", 
-        mcompleted:0,
-        avgscore:0,
-        admin:false,
+        address: "N/A",
         courses:list.length ? list : []
         }
         const result = await db.collection('info').insertOne(tmpl);

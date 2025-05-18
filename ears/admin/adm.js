@@ -1,4 +1,7 @@
 import { addModule, GetCourseList, removeModule } from "../Utilities/api.js";
+import { formatText } from "../Utilities/fomatting.js";
+import { hideLoading, showLoading } from "../Utilities/loader.js";
+import { showNotification } from "../Utilities/notification.js";
 
         const courseSelect = document.getElementById('course-select');
         const moduleList = document.getElementById('module-list');
@@ -9,17 +12,38 @@ import { addModule, GetCourseList, removeModule } from "../Utilities/api.js";
         const cancelAddBtn = document.getElementById('cancel-add');
         const closeModalBtn = document.querySelector('.close-button');
 
+
+            const manageModules =document.querySelector(".li-module");
+    const manageQuiz = document.querySelector(".li-quiz");
+    manageModules.addEventListener("click", e =>{
+        showLoading();
+        setTimeout(() => {
+            window.location.href = "./managemodules.html";
+            hideLoading();
+        }, 2000);
+    })
+    manageQuiz.addEventListener("click", e =>{
+        showLoading();
+        setTimeout(() => {
+            window.location.href = "./managequiz.html";
+            hideLoading();
+        }, 2000);
+    })
         window.onload = async (e) =>{
             e.preventDefault();
             const logout = document.querySelector("#logout-button");
             logout.addEventListener("click", (e)=>{
-            window.location.href = "../auth/login.html";
-            sessionStorage.removeItem("user");
+            showLoading()
+            setTimeout(() => {
+                window.location.href = "../auth/login.html";
+                sessionStorage.removeItem("user");
+                hideLoading();
+            }, 2500);
+                    
             })
             const courses = await GetCourseList();
             // <option value="intro-psych">Introduction to Psychology</option>
             courses.result.forEach((el,index) =>{
-                console.log(el)
                 const option = document.createElement("option");
                 option.setAttribute("value", index);
                 option.textContent = el.title;
@@ -27,12 +51,58 @@ import { addModule, GetCourseList, removeModule } from "../Utilities/api.js";
             })
         }
         // Event Listeners
-        courseSelect.addEventListener('change', loadModules);
-        addModuleBtn.addEventListener('click', showAddModuleModal);
-        removeModuleBtn.addEventListener('click', removeSelectedModule);
-        moduleForm.addEventListener('submit', addNewModule);
-        cancelAddBtn.addEventListener('click', hideAddModuleModal);
-        closeModalBtn.addEventListener('click', hideAddModuleModal);
+        courseSelect.addEventListener('change', e =>{
+                showLoading();
+                setTimeout(() => {
+                loadModules();
+                hideLoading()
+            }, 2500);
+        });
+        addModuleBtn.addEventListener('click', e =>{
+            e.preventDefault();
+            showLoading();
+            setTimeout(() => {
+            showAddModuleModal()
+            hideLoading()
+            }, 2500);
+            
+        });
+        removeModuleBtn.addEventListener('click', e =>{
+            e.preventDefault();
+                showLoading();
+            setTimeout(() => {
+                removeSelectedModule();
+                hideLoading();     
+            }, 2500);
+        });
+            
+        moduleForm.addEventListener('submit', e => {
+            e.preventDefault();
+        
+            setTimeout(() => {
+                addNewModule();
+                hideLoading;
+            }, 2500);
+        });
+        cancelAddBtn.addEventListener('click', e =>{
+            e.preventDefault();
+                showLoading();
+            setTimeout(() => {
+                hideAddModuleModal()
+                hideLoading()
+            }, 2500);    
+            showNotification("Closed", "info");
+
+        });
+        closeModalBtn.addEventListener('click', e =>{
+            e.preventDefault();
+                showLoading();
+                setTimeout(() => {
+                hideAddModuleModal()
+                hideLoading()
+            }, 2500);    
+            showNotification("Closed", "info");
+        });
         // Functions
         async function loadModules() {
             const courseId = courseSelect.value;
@@ -40,6 +110,7 @@ import { addModule, GetCourseList, removeModule } from "../Utilities/api.js";
             const courses = await GetCourseList();
             
             if (!courseId) {
+                showNotification("Select a course", "info")
                 moduleList.innerHTML = '<div class="placeholder-message"><p>Select a course to view or manage its modules.</p></div>';
                 return;
             }
@@ -47,6 +118,7 @@ import { addModule, GetCourseList, removeModule } from "../Utilities/api.js";
             const course = courses.result[courseId];
             
             if (course.modules.length === 0) {
+                showNotification("No modules found", "info");
                 moduleList.innerHTML = '<div class="placeholder-message"><p>This course currently has no modules.</p></div>';
                 return;
             }
@@ -66,7 +138,7 @@ import { addModule, GetCourseList, removeModule } from "../Utilities/api.js";
 
         function showAddModuleModal() {
             if (!courseSelect.value) {
-                alert('Please select a course first');
+                showNotification('Please select a course first');
                 return;
             }
             addModuleModal.style.display = 'flex';
@@ -77,35 +149,33 @@ import { addModule, GetCourseList, removeModule } from "../Utilities/api.js";
             moduleForm.reset();
         }
 
-        async function addNewModule(e) {
-            e.preventDefault();
+        async function addNewModule() {
             
             const title = document.getElementById('module-title').value;
             const body = document.getElementById('module-content').value;
             const courseId = courseSelect.value;
             const courseTitle = (await GetCourseList()).result[courseId].title;
-            // In a real app, you would send this to your backend
             addModule({ title, body, courseTitle });
             
             hideAddModuleModal();
             loadModules();
             
             // Show success message
-            alert('Module added successfully!');
+            showNotification('Module added successfully!', "success");
         }
 
         async function removeSelectedModule() {
             const courseId = courseSelect.value;
             
             if (!courseId) {
-                alert('Please select a course first');
+                showNotification('Please select a course first', "info");
                 return;
             }
             
             const selectedModule = document.querySelector('input[name="selected-module"]:checked');
             
             if (!selectedModule) {
-                alert('Please select a module to remove');
+                showNotification('Please select a module to remove', "info");
                 return;
             }
             
@@ -116,7 +186,7 @@ import { addModule, GetCourseList, removeModule } from "../Utilities/api.js";
                 const moduleTitle = course.modules[parseInt(selectedModule.value)].title;
                 const result = removeModule({ courseTitle,  moduleTitle});
                 loadModules();
-                alert('Module removed successfully!');
+                showNotification('Module removed successfully!', "success");
             }
         }
 

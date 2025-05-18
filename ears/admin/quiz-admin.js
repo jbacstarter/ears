@@ -1,5 +1,23 @@
 import { GetCourseList, addQuiz, removeQuiz, updateQuiz } from "../Utilities/api.js";
+import { hideLoading, showLoading } from "../Utilities/loader.js";
+import { showNotification } from "../Utilities/notification.js";
+    const manageModules =document.querySelector(".li-module");
+    const manageQuiz = document.querySelector(".li-quiz");
 
+    manageModules.addEventListener("click", e =>{
+        showLoading();
+        setTimeout(() => {
+            window.location.href = "./managemodules.html";
+            hideLoading();
+        }, 2000);
+    })
+    manageQuiz.addEventListener("click", e =>{
+        showLoading();
+        setTimeout(() => {
+            window.location.href = "./managequiz.html";
+            hideLoading();
+        }, 2000);
+    })
 // DOM Elements
 const courseSelect = document.getElementById('course-select');
 const quizList = document.getElementById('quiz-list');
@@ -68,11 +86,13 @@ window.addEventListener('click', (e) => {
 
 // Load quizzes for selected course
 async function loadQuizzes() {
+    showLoading();
     const courseIndex = courseSelect.value;
     quizList.innerHTML = '';
     selectedQuizIndex = null;
     
     if (!courseIndex) {
+        showNotification("Select a course", "info")
         quizList.innerHTML = '<div class="placeholder-message"><p>Select a course to view or manage its quizzes.</p></div>';
         return;
     }
@@ -83,6 +103,7 @@ async function loadQuizzes() {
     quizzes = currentCourse.quizzes || [];
     
     if (quizzes.length === 0) {
+        showNotification("No quizzes", "info")
         quizList.innerHTML = '<div class="placeholder-message"><p>This course currently has no quizzes.</p></div>';
         return;
     }
@@ -117,12 +138,14 @@ async function loadQuizzes() {
         
         quizList.appendChild(quizItem);
     });
+    hideLoading();
 }
 
 // Show modal for adding a new quiz
 function showAddQuizModal() {
+    showLoading();
     if (!courseSelect.value) {
-        alert('Please select a course first');
+        showNotification('Please select a course first', "info");
         return;
     }
     
@@ -139,21 +162,25 @@ function showAddQuizModal() {
     document.getElementById('question-list').innerHTML = '';
     
     quizModal.style.display = 'flex';
+    hideLoading();
 }
 
 // Show modal for editing an existing quiz
 function editSelectedQuiz() {
+    showLoading();
     if (selectedQuizIndex === null) {
-        alert('Please select a quiz to edit');
+        showNotification('Please select a quiz to edit', "info");
         return;
     }
     
     isEditing = true;
     currentQuiz = quizzes[selectedQuizIndex];
     showEditQuizModal();
+    hideLoading();
 }
 
 function showEditQuizModal() {
+    showLoading()
     if (!currentQuiz) return;
     
     document.getElementById('quiz-modal-title').textContent = `Edit Quiz: ${currentQuiz.title}`;
@@ -192,6 +219,7 @@ function showEditQuizModal() {
             if (confirm('Are you sure you want to remove this question?')) {
                 currentQuiz.questions.splice(parseInt(e.target.closest('button').dataset.index), 1);
                 showEditQuizModal(); // Refresh the view
+                showNotification("Removed", "success");
             }
         });
         
@@ -199,15 +227,19 @@ function showEditQuizModal() {
     });
     
     quizModal.style.display = 'flex';
+    hideLoading();
 }
 
 // Hide quiz modal
 function hideQuizModal() {
+    showLoading();
     quizModal.style.display = 'none';
+    hideLoading();
 }
 
 // Show modal for adding a new question
 function showAddQuestionModal() {
+    showLoading();
     currentQuestionIndex = null;
     document.getElementById('question-modal-title').textContent = 'Add Question';
     document.getElementById('question-text').value = '';
@@ -218,10 +250,12 @@ function showAddQuestionModal() {
         }
     });
     questionModal.style.display = 'flex';
+    hideLoading();
 }
 
 // Show modal for editing an existing question
 function showEditQuestionModal(questionIndex) {
+    showLoading();
     currentQuestionIndex = questionIndex;
     const question = currentQuiz.questions[questionIndex];
     
@@ -234,17 +268,20 @@ function showEditQuestionModal(questionIndex) {
     });
     
     questionModal.style.display = 'flex';
+    hideLoading();
 }
 
 // Hide question modal
 function hideQuestionModal() {
+    showLoading();
     questionModal.style.display = 'none';
+    hideLoading();
 }
 
 // Save quiz data (add or update)
 async function saveQuizData(e) {
     e.preventDefault();
-    
+    showLoading();
     const title = document.getElementById('quiz-title').value;
     const timeLimit = Math.abs(Number(document.getElementById('quiz-time').value)) * 60;
     
@@ -272,17 +309,18 @@ async function saveQuizData(e) {
         
         hideQuizModal();
         loadQuizzes();
-        alert('Quiz saved successfully!');
+        showNotification('Quiz saved successfully!', "success");
     } catch (error) {
         console.error('Error saving quiz:', error);
-        alert(`Failed to save quiz: ${error.message}`);
+        showNotification(`Failed to save quiz`, "error");
     }
+    hideLoading();
 }
 
 // Save question to the current quiz
 function saveQuestionData(e) {
     e.preventDefault();
-    
+    showLoading();
     const problem = document.getElementById('question-text').value;
     const choices = Array.from(document.querySelectorAll('.choice-text')).map(input => input.value);
     const answerIndex = parseInt(document.querySelector('input[name="correct-choice"]:checked').value);
@@ -333,18 +371,21 @@ function saveQuestionData(e) {
                 if (confirm('Are you sure you want to remove this question?')) {
                     currentQuiz.questions.splice(parseInt(e.target.closest('button').dataset.index), 1);
                     questionItem.remove();
+                    showNotification("Removed","success")
                 }
             });
             
             document.getElementById('question-list').appendChild(questionItem);
         });
     }
+    hideLoading();
 }
 
 // Remove selected quiz
 async function removeSelectedQuiz() {
+    showLoading();
     if (selectedQuizIndex === null) {
-        alert('Please select a quiz to remove');
+        showNotification('Please select a quiz to remove');
         return;
     }
     
@@ -359,9 +400,10 @@ async function removeSelectedQuiz() {
         
         await removeQuiz({ courseTitle, quizTitle });
         loadQuizzes();
-        alert('Quiz removed successfully!');
+        showNotification('Quiz removed successfully!',"success");
     } catch (error) {
         console.error('Error removing quiz:', error);
-        alert(`Failed to remove quiz: ${error.message}`);
+        showNotification(`Failed to remove quiz`, "error");
     }
+    hideLoading();
 }

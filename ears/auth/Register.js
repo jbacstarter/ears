@@ -20,11 +20,11 @@ const send = async (data)=>{
     const text = details.text;
 
     if(status != 200){
-      showNotification("Account Already Exists...", "warning");
+      showNotification("Account Already Exists", "warning");
     }else if(status == 400){
-      showNotification("Internal Server Error...", "error");
+      showNotification("Internal Server Error", "error");
     }else if (status ==200){
-      showNotification("Registered...", "success");
+      showNotification("Registered", "success");
       await initAccount(data); 
     }
 }

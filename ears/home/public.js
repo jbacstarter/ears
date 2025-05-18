@@ -1,14 +1,17 @@
 import { AccountInfo, GetCourse, GetCourseList, GetInfoSummary, ModuleStatus, updateProfile, UpdateScore } from "../Utilities/api.js";
 import { checkAnswers } from "../Utilities/checkAnswers.js";
+import { formatText } from "../Utilities/fomatting.js";
 import { hideLoading, showLoading } from "../Utilities/loader.js";
 import { showNotification } from "../Utilities/notification.js";
 import QuizTimer from "../Utilities/QuizTimer.js";
 import { logout } from "./logout.js";
+import { supportPage } from "./static.js";
 
 window.onload = (e) =>{
+    e.preventDefault();
+    e.stopPropagation()
     logout();
 }
-
 
 const getUser = () =>{
     return sessionStorage.getItem("user");
@@ -26,10 +29,10 @@ const clearActiveClass = ()=>{
         el.classList.remove("active");
     })
 }
-window.addEventListener("DOMContentLoaded",async (e) =>{
+window.addEventListener("load",async (e) =>{
     showLoading()
-    setTimeout(() => {
-    updateDashboard();
+    setTimeout(async () => {
+    await updateDashboard();
     hideLoading();
     }, 2500);
 })
@@ -37,8 +40,8 @@ window.addEventListener("DOMContentLoaded",async (e) =>{
 dashboard.addEventListener("click", async (e) =>{
     e.preventDefault();
     showLoading()
-    setTimeout(() => {
-    updateDashboard();
+    setTimeout( async () => {
+    await updateDashboard();
     hideLoading();
     }, 2500);
 })
@@ -131,7 +134,8 @@ profile.addEventListener("click", async (e) => {
     setTimeout(() => {
     updateProfilePage();
     hideLoading();
-    }, 1500);
+}, 1500);
+    sessionStorage.setItem("page", 1);
 });
 
 const updateProfilePage = async () =>{
@@ -271,16 +275,14 @@ const updateProfilePage = async () =>{
             setTimeout(async () => {
                 const response = await updateProfile({...updatedValues, userEmail: getUser() });
                 hideLoading();
+                if (response.success) {
+                    actionButtons.style.display = 'none';
+                    editBtn.style.display = 'block';
+                    
+                    showNotification("Profile updated successfully!", "success")
+                }
             }, 2500);
                 
-            if (response.success) {
-                actionButtons.style.display = 'none';
-                editBtn.style.display = 'block';
-                
-                showNotification("Profile updated successfully!", "success")
-            } else {
-                throw new Error(response.message || 'Failed to update profile');
-            }
         } catch (error) {
             showNotification("Failed to update profile", "error");
             editableFields.forEach(field => {
@@ -413,6 +415,7 @@ const showCourse = async (courseTitle) => {
     content.appendChild(moduleHeader);
 
      const mLength = info.result.modules.length;
+     console.log(info.result.modules);
     for(let i = 0 ; i < mLength; i++){
         const mCard = document.createElement("div");
         const title = document.createElement("h4");
@@ -425,7 +428,13 @@ const showCourse = async (courseTitle) => {
             hideLoading();
             }, 1500);
         })
-        
+        if(info.result.modules[i].status){
+            title.style.color = "rgb(7, 7, 197)";
+            title.style.textDecoration = "underline";
+        }else {
+            title.style.color = "";
+            title.style.textDecoration = "";
+        }
         mCard.appendChild(title);
         content.appendChild(mCard);
     }
@@ -447,6 +456,13 @@ const showCourse = async (courseTitle) => {
         const nscore =info.result.quizzes[i].score;
         const maxScore = info.result.quizzes[i].maxScore;
         score.textContent = (info.result.quizzes[i].status ? "(Closed)  " : "(Open)  ") + (nscore > 0 ? `Score: ${nscore}/${maxScore}`: `Score: ${maxScore}/${maxScore}`);
+        if(info.result.quizzes[i].status){
+            title.style.color = "rgb(7, 7, 197)";
+            title.style.textDecoration = "underline";
+        }else {
+            title.style.textDecoration = "";
+            title.style.color = "";
+        }
         qCard.appendChild(title);
         qCard.append(score);
         content.appendChild(qCard);
@@ -465,9 +481,6 @@ const showCourse = async (courseTitle) => {
 }
 
 const showModule = (info, courseTitle,index) => {
-    if(info.result.modules[index].status){
-        // updateDashboard();
-    }else {
         const parent = document.querySelector('.main-content-area');
     const oldContent = document.querySelector(".main-content-area main");   
     if (oldContent) {
@@ -484,7 +497,11 @@ const showModule = (info, courseTitle,index) => {
         
         <div class="module-content">
             <div class="module-text">
-                <p>${info.result.modules[index].body}</p>
+                <p>${formatText(info.result.modules[index].body, {
+  headings: true,
+  lists: true,
+  listDepth: 5
+})}</p>
             </div>
             
             <div class="module-actions">
@@ -496,7 +513,7 @@ const showModule = (info, courseTitle,index) => {
         </div>
     `;
         const doneButton = moduleBody.querySelector('.done-button');
-    doneButton.addEventListener('click', () => {
+    doneButton.addEventListener('click', async () => {
         showLoading();
         setTimeout(() => {
             ModuleStatus(getUser(), courseTitle,info.result.modules[index].title,true);
@@ -505,10 +522,10 @@ const showModule = (info, courseTitle,index) => {
         showNotification("Module completed...", "success")
         doneButton.innerHTML = '<i class="fas fa-check"></i> Completed!';
         doneButton.classList.add('completed');
-        updateDashboard();
+        await updateDashboard();
     });
     parent.appendChild(moduleBody);
-    }
+    
     
 }
 
@@ -600,24 +617,62 @@ const showQuiz = (info,index) => {
             const submitBtn = document.createElement("button");
             submitBtn.classList.add("submit-button");
             submitBtn.textContent = "Submit Assessment"; 
-            submitBtn.addEventListener("click", (e) =>{
+            submitBtn.addEventListener("click", async (e) =>{
+                e.preventDefault();
                 const res =  checkAnswers( answers, answerList);
                 showLoading();
-                setTimeout(() => {
+                setTimeout(async () => {
                     submitQuiz(getUser(), info.result.title, info.result.quizzes[index].title,res);
                     hideLoading();
+                    await updateDashboard();
                 }, 2500);
-                showNotification("Quiz Submitted...", "success");
-                updateDashboard();
+                showNotification("Quiz Submitted", "success");
             })
             footer.appendChild(submitBtn);
             main.appendChild(footer);
 
             parent.appendChild(main);
+        }else{
+            showNotification("Quiz has been closed...", "warning");
         }
 }
 
-const submitQuiz = (user, courseTitle, quizTitle, newScore) =>{
+const submitQuiz = async (user, courseTitle, quizTitle, newScore) =>{
               UpdateScore(user, courseTitle, quizTitle,newScore);
-              updateDashboard();
 }
+
+
+support.addEventListener("click", e =>{
+    e.preventDefault();
+    clearActiveClass();
+    document.querySelector(".support").classList.add("active");
+    const parent = document.querySelector(".main-content-area")
+    const tempContent = document.querySelector(".main-content-area main");
+    if(tempContent){
+        parent.removeChild(tempContent);
+    }
+    const content = document.createElement("main");
+    content.classList.add("content");
+    content.innerHTML +=supportPage;
+    parent.appendChild(content);
+        const faqQuestions = document.querySelectorAll('.faq-question');
+    
+    faqQuestions.forEach(question => {
+        question.addEventListener('click', () => {
+            const item = question.parentElement;
+            item.classList.toggle('active');
+            
+            // Rotate chevron icon
+            const icon = question.querySelector('i');
+            if (icon) {
+                icon.style.transform = item.classList.contains('active') 
+                    ? 'rotate(180deg)' 
+                    : 'rotate(0)';
+            }
+        });
+    });
+    document.querySelector(".chat-button").addEventListener("click", (e) =>{
+e.preventDefault();
+        window.location.href= "https://www.facebook.com/chess.asne";
+    })
+})

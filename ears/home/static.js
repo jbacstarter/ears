@@ -1,197 +1,108 @@
-export const dashb =  `<div class="welcome-banner">
-        <h1>Welcome, <span class="user-name">John</span></h1>
-        <p class="user-progress">You've completed <span class="completed-count">6</span> of <span class="total-modules">12</span> modules</p>
-    </div>
+export const supportPage = `
+                <div class="support-container">
+                    <section class="support-header">
+                        <h1><i class="fas fa-headset"></i> Support Center</h1>
+                        <p class="subtitle">Get help with the Employee Assessment Review System (EARS)</p>
+                    </section>
 
-    <div class="dashboard-sections">
-        <!-- Current Progress Section -->
-        <section class="dashboard-section progress-section">
-            <h2><i class="fas fa-chart-line"></i> Your Progress</h2>
-            <div class="progress-circles">
-                <div class="progress-circle">
-                    <div class="circle" style="--percent:60">
-                        <span>60%</span>
-                    </div>
-                    <p>Overall Completion</p>
-                </div>
-                <div class="progress-circle">
-                    <div class="circle" style="--percent:40">
-                        <span>40%</span>
-                    </div>
-                    <p>Avg Quiz Score</p>
-                </div>
-            </div>
-        </section>
+                    <div class="support-grid">
+                        <!-- Quick Help Section -->
+                        <section class="support-card quick-help">
+                            <h2><i class="fas fa-question-circle"></i> Quick Help</h2>
+                            <div class="help-item">
+                                <h3>How to submit an assessment</h3>
+                                <p>Navigate to Training Modules, select your assessment, and click "Submit" when complete.</p>
+                            </div>
+                            <div class="help-item">
+                                <h3>Viewing assessment results</h3>
+                                <p>Completed assessments appear on your Dashboard with scores and feedback.</p>
+                            </div>
+                            <div class="help-item">
+                                <h3>Updating your profile</h3>
+                                <p>Go to your Profile page to edit personal information and preferences.</p>
+                            </div>
+                        </section>
 
-        <!-- Active Courses Section -->
-        <section class="dashboard-section courses-section">
-            <h2><i class="fas fa-book-open"></i> Your Courses</h2>
-            <div class="course-cards">
-                <div class="course-card">
-                    <h3>Introduction to Psychology</h3>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 60%"></div>
-                    </div>
-                    <div class="course-stats">
-                        <span><i class="fas fa-check"></i> 4/6 modules</span>
-                        <span><i class="fas fa-star"></i> 2/3 quizzes</span>
-                    </div>
-                    <button class="continue-btn">Continue</button>
-                </div>
-                <div class="course-card">
-                    <h3>Introduction to Computer Science</h3>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 30%"></div>
-                    </div>
-                    <div class="course-stats">
-                        <span><i class="fas fa-check"></i> 2/5 modules</span>
-                        <span><i class="fas fa-star"></i> 1/2 quizzes</span>
-                    </div>
-                    <button class="continue-btn">Continue</button>
-                </div>
-            </div>
-        </section>
+                        <!-- Contact Support -->
+                        <section class="support-card contact-support">
+                            <h2><i class="fas fa-envelope"></i> Contact Support</h2>
+                            <div class="contact-methods">
+                                <div class="contact-method">
+                                    <i class="fas fa-envelope"></i>
+                                    <div>
+                                        <h3>Email Us</h3>
+                                        <a href="mailto:support@ears-system.com">support@ears-system.com</a>
+                                    </div>
+                                </div>
+                                <div class="contact-method">
+                                    <i class="fas fa-phone"></i>
+                                    <div>
+                                        <h3>Call Us</h3>
+                                        <p>+63 9690-7584-62</p>
+                                        <p class="hours">Mon-Fri, 8AM-5PM EST</p>
+                                    </div>
+                                </div>
+                                <div class="contact-method">
+                                    <i class="fas fa-comment-dots"></i>
+                                    <div>
+                                        <h3>Live Chat</h3>
+                                        <button class="chat-button">Start Chat</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
 
-        <!-- Quick Actions Section -->
-        <section class="dashboard-section actions-section">
-            <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
-            <div class="action-buttons">
-                <button class="action-btn">
-                    <i class="fas fa-play"></i>
-                    <span>Continue Learning</span>
-                </button>
-                <button class="action-btn">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Take a Quiz</span>
-                </button>
-                <button class="action-btn">
-                    <i class="fas fa-search"></i>
-                    <span>Find Courses</span>
-                </button>
-                <button class="action-btn">
-                    <i class="fas fa-trophy"></i>
-                    <span>View Achievements</span>
-                </button>
-            </div>
-        </section>
-    </div>`;
-export const sprofile = `
-        <h1>User Profile</h1>
-        <section class="profile-section">
-          <div class="profile-card">
-            <h2>Account Information</h2>
-            <div class="profile-info">
-              <p id="name"><strong>Name:</strong> John</p>
-              <p id="email"><strong>Email:</strong> 23101961@usc.edu.ph</p>
-              <p id="gender"><strong>Gender:</strong> Male</p>
-              <p id="address"><strong>Address:</strong> Mactan Plains Residences</p>
-            </div>
-          </div>
-        </section>`;
+                        <!-- FAQ Section -->
+                        <section class="support-card faq-section">
+                            <h2><i class="fas fa-comments"></i> Frequently Asked Questions</h2>
+                            <div class="faq-item">
+                                <button class="faq-question">
+                                    How do I know if my assessment was submitted successfully?
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                                <div class="faq-answer">
+                                    <p>After submission, you'll see a confirmation message and receive an email receipt. The assessment will also appear in your "Completed" section.</p>
+                                </div>
+                            </div>
+                            <div class="faq-item">
+                                <button class="faq-question">
+                                    Can I retake an assessment if I'm not satisfied with my score?
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                                <div class="faq-answer">
+                                    <p>Retake policies vary by assessment. Check the assessment details or contact your administrator for specific rules.</p>
+                                </div>
+                            </div>
+                            <div class="faq-item">
+                                <button class="faq-question">
+                                    Where can I find training materials?
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                                <div class="faq-answer">
+                                    <p>All training materials are available in the Training Modules section, organized by topic and department.</p>
+                                </div>
+                            </div>
+                        </section>
 
-export const shome = `
-                <h1>Training Dashboard</h1>
-
-                <section class="module-overview">
-                    <div class="module-card">
-                        <h3>POS Basics Training</h3>
-                        <p>0% Complete</p>
-                        <a href="#" class="button play-button"><i class="fa-solid fa-play"></i></a>
-                    </div>
-                    <div class="module-card">
-                        <h3>Customer Service Essentials</h3>
-                        <p>0% Complete</p>
-                         <a href="#" class="button play-button"><i class="fa-solid fa-play"></i></a>
-                    </div>
-                    <!-- Add more module cards as needed -->
-                </section>
-
-                <section class="performance-summary">
-                    <h2>Your Performance</h2>
-                    <div class="performance-metrics">
-                        <div class="metric">
-                            <span class="value" id="modules-completed">6</span>
-                            <span class="label">Modules Completed</span>
-                        </div>
-                        <div class="metric">
-                            <span class="value" id="average-score">NaN%</span>
-                            <span class="label">Average Score</span>
-                        </div>
-                    </div>
-                </section>
-            `
-
-export const modules = 
-`<main class="content cardContainer">
-                <div class="card">
-                    <div class="card-content">
-                        <h1>Title</h1>
-                        <h2>Course Code</h2>
-                        <h3>Description</h3>
+                        <!-- About EARS -->
+                        <section class="support-card about-section">
+                            <h2><i class="fas fa-info-circle"></i> About EARS</h2>
+                            <div class="about-content">
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="60" cy="60" r="55" fill="#2563EB"/>
+  <path d="M40 40L80 40L80 80L40 80Z" stroke="white" stroke-width="6" fill="none"/>
+  <path d="M50 50V70H70V50H50Z" fill="white"/>
+  <path d="M30 30L90 30M30 90L90 90" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  <text x="60" y="105" font-family="Arial" font-size="14" font-weight="bold" fill="white" text-anchor="middle">EARS</text>
+</svg>
+                                <p>The Employee Assessment Review System (EARS) is designed to streamline training and competency evaluation across your organization.</p>
+                                <p>Version 2.1.0 | Last updated: May 15, 2025</p>
+                                <div class="system-status">
+                                    <span class="status-indicator active"></span>
+                                    <span>All systems operational</span>
+                                </div>
+                            </div>
+                        </section>
                     </div>
                 </div>
-            </main>`
-
-
-
-        // const module = {
-        //     body:"Module Empty..."
-        // }
-        // const question = {
-        //     problem:"Problem is empty...",
-        //     choices:[],
-        //     answer: ""
-        // }
-        // const quiz = {
-        //     questions:[],
-        //     score:0
-        // }
-        // const course = {
-        //         title:"",
-        //         modules:[],
-        //         quizzes:[]
-        //     }
-
-        // const courses = []
-
-
-        const courses = [
-  {
-    title: "Introduction to Computer Science",
-    modules: [
-      { 
-        title: "Computer Science Fundamentals",
-        body: "Overview of algorithms, data structures, and computational thinking." 
-      },
-      { 
-        title: "Programming Basics",
-        body: "Variables, data types, and control structures in Python/JavaScript." 
-      },
-      { 
-        title: "Web Development",
-        body: "HTML/CSS fundamentals and client-server architecture." 
-      }
-    ],
-    quizzes: [
-      {
-        questions: [
-          {
-            problem: "What does CPU stand for?",
-            choices: ["Central Processing Unit", "Computer Processing Unit", "Central Program Utility", "Core Processing Unit"],
-            answer: "Central Processing Unit"
-          },
-          {
-            problem: "Which language is used for styling web pages?",
-            choices: ["HTML", "CSS", "JavaScript", "Python"],
-            answer: "CSS"
-          },
-          {
-            problem: "What is the output of `print(3 * 'a')` in Python?",
-            choices: ["aaa", "3a", "a3", "Error"],
-            answer: "aaa"
-          }
-        ],
-        score: 0
-      }
-    ]
-  }]
+`

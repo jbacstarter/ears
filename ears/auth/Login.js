@@ -10,7 +10,7 @@ const data = {};
 const email = "admin@gmail.com"
 const password = "admin1234";
 form.addEventListener("submit", async (e) =>{
-    e.preventDefault(); // Prevent page refresh
+    e.preventDefault(); 
     const formData = new FormData(form);
     formData.forEach((value, key) => {
       data[key] = value;
@@ -18,9 +18,12 @@ form.addEventListener("submit", async (e) =>{
 
     if(email === data.email && password === data.password){
       sessionStorage.setItem("user", email);
+      showLoading()
       setTimeout(() => {
-      window.location.href = "../admin/modules.html";
-      }, 2000);
+      window.location.href = "../admin/managemodules.html";
+      hideLoading();
+    }, 2500);
+      showNotification("Signing in (Admin)", "success");
     }
     
     else {
@@ -31,9 +34,9 @@ form.addEventListener("submit", async (e) =>{
     if(status != 200){
       showNotification("Email or Password Incorrect", "warning");
     }else if(status == 400){
-      showNotification("Internal Server Error...", "error");
+      showNotification("Internal Server Error", "error");
     }else {
-      showNotification("Signing in...", "success");
+      showNotification("Signing in", "success");
       sessionStorage.setItem("user", data.email);
       showLoading();
       setTimeout(() => {

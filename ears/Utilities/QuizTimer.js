@@ -19,7 +19,7 @@ export default class QuizTimer {
     if (this.totalSeconds <= 0) {
       this.timeUp();
       return;
-    }
+    }   
     
     this.totalSeconds--;
     this.updateDisplay();
@@ -67,6 +67,7 @@ export default class QuizTimer {
     this.displayElement.textContent = "00:00";
     this.displayElement.className = 'danger';
     this.submitQuiz();
+    
   }
 
   submitQuiz() {

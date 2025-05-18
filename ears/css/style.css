@@ -2002,3 +2002,201 @@ a.button:hover {
     @keyframes fadeOut {
         100% { opacity: 0; visibility: hidden; }
     }
+
+    .module-closed {
+        color: rgb(7, 7, 197);
+    }
+
+      .support-container {
+                    padding: 2rem;
+                    max-width: 1200px;
+                    margin: 0 auto;
+                }
+
+                .support-header {
+                    text-align: center;
+                    margin-bottom: 2rem;
+                }
+
+                .support-header h1 {
+                    color: #2563eb;
+                    margin-bottom: 0.5rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.5rem;
+                }
+
+                .subtitle {
+                    color: #64748b;
+                    font-size: 1.1rem;
+                }
+
+                .support-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                    gap: 1.5rem;
+                }
+
+                .support-card {
+                    background: white;
+                    border-radius: 8px;
+                    padding: 1.5rem;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                }
+
+                .support-card h2 {
+                    color: #2563eb;
+                    margin-bottom: 1.5rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    font-size: 1.3rem;
+                }
+
+                .help-item {
+                    margin-bottom: 1.2rem;
+                    padding-bottom: 1.2rem;
+                    border-bottom: 1px solid #e2e8f0;
+                }
+
+                .help-item:last-child {
+                    border-bottom: none;
+                    margin-bottom: 0;
+                    padding-bottom: 0;
+                }
+
+                .help-item h3 {
+                    color: #1e40af;
+                    font-size: 1rem;
+                    margin-bottom: 0.5rem;
+                }
+
+                .contact-method {
+                    display: flex;
+                    gap: 1rem;
+                    margin-bottom: 1.2rem;
+                    align-items: center;
+                }
+
+                .contact-method i {
+                    font-size: 1.2rem;
+                    color: #2563eb;
+                    width: 30px;
+                    text-align: center;
+                }
+
+                .contact-method h3 {
+                    font-size: 1rem;
+                    margin-bottom: 0.2rem;
+                    color: #1e293b;
+                }
+
+                .contact-method a {
+                    color: #2563eb;
+                    text-decoration: none;
+                }
+
+                .contact-method a:hover {
+                    text-decoration: underline;
+                }
+
+                .hours {
+                    font-size: 0.8rem;
+                    color: #64748b;
+                }
+
+                .chat-button {
+                    background: #2563eb;
+                    color: white;
+                    border: none;
+                    padding: 0.5rem 1rem;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 0.9rem;
+                }
+
+                .chat-button:hover {
+                    background: #1e40af;
+                }
+
+                .faq-item {
+                    margin-bottom: 0.8rem;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 6px;
+                    overflow: hidden;
+                }
+
+                .faq-question {
+                    width: 100%;
+                    text-align: left;
+                    padding: 1rem;
+                    background: #f8fafc;
+                    border: none;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    cursor: pointer;
+                    font-weight: 500;
+                }
+
+                .faq-question:hover {
+                    background: #f1f5f9;
+                }
+
+                .faq-answer {
+                    padding: 0 1rem;
+                    max-height: 0;
+                    overflow: hidden;
+                    transition: max-height 0.3s ease;
+                }
+
+                .faq-answer p {
+                    padding: 1rem 0;
+                }
+
+                .faq-item.active .faq-answer {
+                    max-height: 200px;
+                }
+
+                .about-content {
+                    text-align: center;
+                }
+
+                .about-logo {
+                    height: 80px;
+                    margin-bottom: 1rem;
+                }
+
+                .about-content p {
+                    margin-bottom: 1rem;
+                }
+
+                .system-status {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.5rem;
+                    margin-top: 1rem;
+                }
+
+                .status-indicator {
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 50%;
+                    background: #ccc;
+                }
+
+                .status-indicator.active {
+                    background: #10b981;
+                }
+
+                @media (max-width: 768px) {
+                    .support-container {
+                        padding: 1rem;
+                    }
+                    
+                    .support-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
