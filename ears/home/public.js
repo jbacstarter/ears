@@ -47,7 +47,7 @@ dashboard.addEventListener("click", async (e) =>{
 })
 
 
-const updateDashboard = async () => {
+export const updateDashboard = async () => {
     clearActiveClass();
     document.querySelector(".dashboard").classList.add("active");
     const parent = document.querySelector(".main-content-area")
@@ -415,7 +415,6 @@ const showCourse = async (courseTitle) => {
     content.appendChild(moduleHeader);
 
      const mLength = info.result.modules.length;
-     console.log(info.result.modules);
     for(let i = 0 ; i < mLength; i++){
         const mCard = document.createElement("div");
         const title = document.createElement("h4");
@@ -461,8 +460,9 @@ const showCourse = async (courseTitle) => {
             title.style.textDecoration = "underline";
         }else {
             title.style.textDecoration = "";
-            title.style.color = "";
+            title.style.color = "black";
         }
+        
         qCard.appendChild(title);
         qCard.append(score);
         content.appendChild(qCard);

@@ -1,3 +1,7 @@
+import { updateDashboard } from "../home/public.js";
+import { hideLoading, showLoading } from "./loader.js";
+import { showNotification } from "./notification.js";
+
 export default class QuizTimer {
   constructor(durationInMinutes, displayElement) {
     this.totalSeconds = durationInMinutes * 60;
@@ -67,7 +71,12 @@ export default class QuizTimer {
     this.displayElement.textContent = "00:00";
     this.displayElement.className = 'danger';
     this.submitQuiz();
-    
+    showLoading();
+    setTimeout(async () => {
+      await updateDashboard();
+      hideLoading()
+    }, 1500);
+    showNotification("Time's up. Note: No marks if not submitted within the time limit.", 'info')
   }
 
   submitQuiz() {
