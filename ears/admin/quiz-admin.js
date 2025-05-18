@@ -1,8 +1,11 @@
+import { GetCourseList, addQuiz, removeQuiz, updateQuiz } from "../Utilities/api.js";
+
 // DOM Elements
 const courseSelect = document.getElementById('course-select');
 const quizList = document.getElementById('quiz-list');
 const addQuizBtn = document.getElementById('add-quiz-btn');
 const removeQuizBtn = document.getElementById('remove-quiz-btn');
+const editQuizBtn = document.getElementById('edit-quiz-btn'); // Add this button to your HTML
 const quizModal = document.getElementById('quiz-modal');
 const questionModal = document.getElementById('question-modal');
 const quizForm = document.getElementById('quiz-form');
@@ -14,157 +17,75 @@ const closeButtons = document.querySelectorAll('.close-button');
 
 // State variables
 let currentCourse = null;
+let currentCourseIndex = null;
 let quizzes = [];
 let currentQuiz = null;
+let selectedQuizIndex = null;
 let currentQuestionIndex = null;
 let isEditing = false;
 
-// Sample course data (would normally come from API)
-const courses = [
-    {
-        _id: "68289b7f08317006d20ac896",
-        title: "Introduction to Psychology",
-        quizzes: [
-            {
-                title: "Foundations Quiz",
-                timeLimit: 300,
-                questions: [
-                    {
-                        problem: "Who founded psychoanalysis?",
-                        choices: ["Pavlov", "Skinner", "Freud", "Maslow"],
-                        answer: "Freud"
-                    },
-                    {
-                        problem: "Which school focused on observable behavior?",
-                        choices: ["Structuralism", "Behaviorism", "Humanism", "Gestalt"],
-                        answer: "Behaviorism"
-                    }
-                ]
-            },
-            {
-                title: "Biological Psychology Quiz",
-                timeLimit: 300,
-                questions: [
-                    {
-                        problem: "Which brain area controls movement?",
-                        choices: ["Hippocampus", "Amygdala", "Cerebellum", "Frontal lobe"],
-                        answer: "Cerebellum"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        _id: "68289b7f08317006d20ac897",
-        title: "Computer Science 101",
-        quizzes: [
-            {
-                title: "Programming Basics Quiz",
-                timeLimit: 240,
-                questions: [
-                    {
-                        problem: "What does HTML stand for?",
-                        choices: ["Hyperlinks and Text Markup Language", "Home Tool Markup Language", "Hyper Text Markup Language", "Hyper Text Marking Language"],
-                        answer: "Hyper Text Markup Language"
-                    }
-                ]
-            }
-        ]
-    }
-];
-
-// Initialize the dashboard
-function initDashboard() {
-    loadCourses();
-    setupEventListeners();
-}
-
-// Load courses into the dropdown
-function loadCourses() {
-    courseSelect.innerHTML = '<option value="">-- Select a Course --</option>';
-    courses.forEach(course => {
-        const option = document.createElement('option');
-        option.value = course._id;
+// Initialize the page
+window.onload = async (e) => {
+    e.preventDefault();
+    const logout = document.querySelector("#logout-button");
+    logout.addEventListener("click", (e)=>{
+    window.location.href = "../auth/login.html";
+    sessionStorage.removeItem("user");
+    })
+    const courses = await GetCourseList();
+    courses.result.forEach((course, index) => {
+        const option = document.createElement("option");
+        option.setAttribute("value", index);
         option.textContent = course.title;
         courseSelect.appendChild(option);
     });
-}
+};
 
-// Setup event listeners
-function setupEventListeners() {
-    // Course selection
-    courseSelect.addEventListener('change', (e) => {
-        const courseId = e.target.value;
-        currentCourse = courses.find(c => c._id === courseId);
-        loadQuizzes();
+// Event Listeners
+courseSelect.addEventListener('change', loadQuizzes);
+addQuizBtn.addEventListener('click', showAddQuizModal);
+removeQuizBtn.addEventListener('click', removeSelectedQuiz);
+editQuizBtn.addEventListener('click', editSelectedQuiz); // New event listener for edit
+quizForm.addEventListener('submit', (e)=>{
+    saveQuizData(e);
+});
+questionForm.addEventListener('submit', saveQuestionData);
+addQuestionBtn.addEventListener('click', showAddQuestionModal);
+cancelQuizBtn.addEventListener('click', hideQuizModal);
+cancelQuestionBtn.addEventListener('click', hideQuestionModal);
+closeButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        if (quizModal.style.display === 'flex') hideQuizModal();
+        if (questionModal.style.display === 'flex') hideQuestionModal();
     });
+});
 
-    // Quiz buttons
-    addQuizBtn.addEventListener('click', () => {
-        if (!currentCourse) {
-            alert('Please select a course first');
-            return;
-        }
-        openQuizModal();
-    });
+// Close modals when clicking outside
+window.addEventListener('click', (e) => {
+    if (e.target === quizModal) hideQuizModal();
+    if (e.target === questionModal) hideQuestionModal();
+});
 
-    removeQuizBtn.addEventListener('click', () => {
-        if (!currentQuiz) {
-            alert('Please select a quiz to remove');
-            return;
-        }
-        if (confirm(`Are you sure you want to remove the quiz "${currentQuiz.title}"?`)) {
-            removeQuiz();
-        }
-    });
-
-    // Quiz form submission
-    quizForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        saveQuiz();
-    });
-
-    // Question form submission
-    questionForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        saveQuestion();
-    });
-
-    // Add question button
-    addQuestionBtn.addEventListener('click', () => {
-        openQuestionModal();
-    });
-
-    // Cancel buttons
-    cancelQuizBtn.addEventListener('click', closeQuizModal);
-    cancelQuestionBtn.addEventListener('click', closeQuestionModal);
-
-    // Close buttons
-    closeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            if (quizModal.style.display === 'flex') closeQuizModal();
-            if (questionModal.style.display === 'flex') closeQuestionModal();
-        });
-    });
-
-    // Click outside modal to close
-    window.addEventListener('click', (e) => {
-        if (e.target === quizModal) closeQuizModal();
-        if (e.target === questionModal) closeQuestionModal();
-    });
-}
-
-// Load quizzes for the selected course
-function loadQuizzes() {
+// Load quizzes for selected course
+async function loadQuizzes() {
+    const courseIndex = courseSelect.value;
     quizList.innerHTML = '';
-    currentQuiz = null;
+    selectedQuizIndex = null;
     
-    if (!currentCourse || !currentCourse.quizzes || currentCourse.quizzes.length === 0) {
-        quizList.innerHTML = '<div class="placeholder-message"><p>No quizzes found for this course.</p></div>';
+    if (!courseIndex) {
+        quizList.innerHTML = '<div class="placeholder-message"><p>Select a course to view or manage its quizzes.</p></div>';
         return;
     }
-
-    quizzes = currentCourse.quizzes;
+    
+    const courses = await GetCourseList();
+    currentCourse = courses.result[courseIndex];
+    currentCourseIndex = courseIndex;
+    quizzes = currentCourse.quizzes || [];
+    
+    if (quizzes.length === 0) {
+        quizList.innerHTML = '<div class="placeholder-message"><p>This course currently has no quizzes.</p></div>';
+        return;
+    }
     
     quizzes.forEach((quiz, index) => {
         const quizItem = document.createElement('div');
@@ -179,21 +100,18 @@ function loadQuizzes() {
                     <span><i class="fas fa-question-circle"></i> ${quiz.questions.length} questions</span>
                 </div>
             </div>
-            <button class="action-button edit-button">Edit</button>
+            <input type="radio" name="selected-quiz" value="${index}">
         `;
         
         quizItem.addEventListener('click', (e) => {
-            if (e.target.tagName === 'BUTTON') {
-                currentQuiz = quiz;
-                currentQuestionIndex = null;
-                openQuizModal(true);
-            } else {
-                // Select for removal
+            if (e.target.type === 'radio') {
+                // Select for edit/remove
                 document.querySelectorAll('.quiz-item').forEach(item => {
                     item.classList.remove('selected');
                 });
                 quizItem.classList.add('selected');
-                currentQuiz = quiz;
+                selectedQuizIndex = index;
+                currentQuiz = quizzes[index];
             }
         });
         
@@ -201,149 +119,174 @@ function loadQuizzes() {
     });
 }
 
-// Open quiz modal for adding/editing
-function openQuizModal(editing = false) {
-    isEditing = editing;
-    const modalTitle = document.getElementById('quiz-modal-title');
-    const questionList = document.getElementById('question-list');
-    
-    if (editing) {
-        modalTitle.textContent = `Edit Quiz: ${currentQuiz.title}`;
-        document.getElementById('quiz-title').value = currentQuiz.title;
-        document.getElementById('quiz-time').value = currentQuiz.timeLimit / 60;
-        
-        // Load questions
-        questionList.innerHTML = '';
-        currentQuiz.questions.forEach((question, index) => {
-            addQuestionToDOM(question, index);
-        });
-    } else {
-        modalTitle.textContent = 'Add New Quiz';
-        document.getElementById('quiz-title').value = '';
-        document.getElementById('quiz-time').value = 5;
-        questionList.innerHTML = '';
-        currentQuiz = {
-            title: '',
-            timeLimit: 300,
-            questions: []
-        };
+// Show modal for adding a new quiz
+function showAddQuizModal() {
+    if (!courseSelect.value) {
+        alert('Please select a course first');
+        return;
     }
+    
+    isEditing = false;
+    currentQuiz = {
+        title: '',
+        timeLimit: 300, // 5 minutes in seconds
+        questions: []
+    };
+    
+    document.getElementById('quiz-modal-title').textContent = 'Add New Quiz';
+    document.getElementById('quiz-title').value = '';
+    document.getElementById('quiz-time').value = 5;
+    document.getElementById('question-list').innerHTML = '';
     
     quizModal.style.display = 'flex';
 }
 
-// Close quiz modal
-function closeQuizModal() {
-    quizModal.style.display = 'none';
+// Show modal for editing an existing quiz
+function editSelectedQuiz() {
+    if (selectedQuizIndex === null) {
+        alert('Please select a quiz to edit');
+        return;
+    }
+    
+    isEditing = true;
+    currentQuiz = quizzes[selectedQuizIndex];
+    showEditQuizModal();
 }
 
-// Open question modal for adding/editing
-function openQuestionModal(editing = false, questionIndex = null) {
-    const modalTitle = document.getElementById('question-modal-title');
-    const questionForm = document.getElementById('question-form');
+function showEditQuizModal() {
+    if (!currentQuiz) return;
     
-    if (editing && questionIndex !== null) {
-        modalTitle.textContent = 'Edit Question';
-        const question = currentQuiz.questions[questionIndex];
-        document.getElementById('question-text').value = question.problem;
+    document.getElementById('quiz-modal-title').textContent = `Edit Quiz: ${currentQuiz.title}`;
+    document.getElementById('quiz-title').value = currentQuiz.title;
+    document.getElementById('quiz-time').value = currentQuiz.timeLimit / 60;
+    
+    const questionList = document.getElementById('question-list');
+    questionList.innerHTML = '';
+    
+    currentQuiz.questions.forEach((question, index) => {
+        const questionItem = document.createElement('div');
+        questionItem.className = 'question-item';
+        questionItem.innerHTML = `
+            <div class="question-actions">
+                <button type="button" class="edit-question-btn" data-index="${index}" title="Edit"><i class="fas fa-edit"></i></button>
+                <button type="button" class="remove-question-btn" data-index="${index}" title="Remove"><i class="fas fa-trash"></i></button>
+            </div>
+            <h4>${question.problem}</h4>
+            <ol class="question-choices">
+                ${question.choices.map((choice, i) => `
+                    <li class="${choice === question.answer ? 'correct-answer' : ''}">${choice}</li>
+                `).join('')}
+            </ol>
+        `;
         
-        const choiceInputs = document.querySelectorAll('.choice-text');
-        const correctRadios = document.querySelectorAll('input[name="correct-choice"]');
+        // Modified event listener for edit button
+        questionItem.querySelector('.edit-question-btn').addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent default behavior
+            e.stopPropagation(); // Stop event bubbling
+            showEditQuestionModal(parseInt(e.target.closest('button').dataset.index));
+        });
         
-        question.choices.forEach((choice, index) => {
-            choiceInputs[index].value = choice;
-            if (choice === question.answer) {
-                correctRadios[index].checked = true;
+        questionItem.querySelector('.remove-question-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (confirm('Are you sure you want to remove this question?')) {
+                currentQuiz.questions.splice(parseInt(e.target.closest('button').dataset.index), 1);
+                showEditQuizModal(); // Refresh the view
             }
         });
         
-        currentQuestionIndex = questionIndex;
-    } else {
-        modalTitle.textContent = 'Add Question';
-        document.getElementById('question-text').value = '';
-        document.querySelectorAll('.choice-text').forEach(input => {
-            input.value = '';
-        });
-        document.querySelector('input[name="correct-choice"]').checked = true;
-        currentQuestionIndex = null;
-    }
+        questionList.appendChild(questionItem);
+    });
+    
+    quizModal.style.display = 'flex';
+}
+
+// Hide quiz modal
+function hideQuizModal() {
+    quizModal.style.display = 'none';
+}
+
+// Show modal for adding a new question
+function showAddQuestionModal() {
+    currentQuestionIndex = null;
+    document.getElementById('question-modal-title').textContent = 'Add Question';
+    document.getElementById('question-text').value = '';
+    document.querySelectorAll('.choice-text').forEach((input, index) => {
+        input.value = '';
+        if (index === 0) {
+            input.closest('.choice-input').querySelector('input[type="radio"]').checked = true;
+        }
+    });
+    questionModal.style.display = 'flex';
+}
+
+// Show modal for editing an existing question
+function showEditQuestionModal(questionIndex) {
+    currentQuestionIndex = questionIndex;
+    const question = currentQuiz.questions[questionIndex];
+    
+    document.getElementById('question-modal-title').textContent = 'Edit Question';
+    document.getElementById('question-text').value = question.problem;
+    
+    document.querySelectorAll('.choice-text').forEach((input, index) => {
+        input.value = question.choices[index] || '';
+        input.closest('.choice-input').querySelector('input[type="radio"]').checked = (question.answer === question.choices[index]);
+    });
     
     questionModal.style.display = 'flex';
 }
 
-// Close question modal
-function closeQuestionModal() {
+// Hide question modal
+function hideQuestionModal() {
     questionModal.style.display = 'none';
 }
 
-// Add question to DOM
-function addQuestionToDOM(question, index) {
-    const questionList = document.getElementById('question-list');
-    const questionItem = document.createElement('div');
-    questionItem.className = 'question-item';
-    questionItem.dataset.index = index;
+// Save quiz data (add or update)
+async function saveQuizData(e) {
+    e.preventDefault();
     
-    questionItem.innerHTML = `
-        <div class="question-actions">
-            <button class="edit-question-btn" title="Edit"><i class="fas fa-edit"></i></button>
-            <button class="remove-question-btn" title="Remove"><i class="fas fa-trash"></i></button>
-        </div>
-        <h4>${question.problem}</h4>
-        <ol class="question-choices">
-            ${question.choices.map((choice, i) => `
-                <li class="${choice === question.answer ? 'correct-answer' : ''}">${choice}</li>
-            `).join('')}
-        </ol>
-    `;
-    
-    // Add event listeners for question actions
-    questionItem.querySelector('.edit-question-btn').addEventListener('click', () => {
-        openQuestionModal(true, index);
-    });
-    
-    questionItem.querySelector('.remove-question-btn').addEventListener('click', () => {
-        if (confirm('Are you sure you want to remove this question?')) {
-            currentQuiz.questions.splice(index, 1);
-            loadQuizzes(); // Refresh the quiz list
-            openQuizModal(true); // Reopen modal with updated questions
-        }
-    });
-    
-    questionList.appendChild(questionItem);
-}
-
-// Save quiz to the database (simulated)
-function saveQuiz() {
     const title = document.getElementById('quiz-title').value;
-    const timeLimit = document.getElementById('quiz-time').value * 60;
+    const timeLimit = Math.abs(Number(document.getElementById('quiz-time').value)) * 60;
     
     currentQuiz.title = title;
     currentQuiz.timeLimit = timeLimit;
+    currentQuiz.maxScore = currentQuiz.questions.length;
     
-    if (isEditing) {
-        // Find and update the quiz in the course
-        const quizIndex = currentCourse.quizzes.findIndex(q => q.title === currentQuiz.title);
-        if (quizIndex !== -1) {
-            currentCourse.quizzes[quizIndex] = currentQuiz;
+    const courses = await GetCourseList();
+    const courseTitle = courses.result[currentCourseIndex].title;
+    const originalQuizTitle = selectedQuizIndex != null? courses.result[currentCourseIndex].quizzes[selectedQuizIndex].title : null; // Keep original for URL
+    
+    try {
+        if (isEditing) {
+            await updateQuiz({
+                courseTitle,
+                quizTitle: originalQuizTitle, // Use original title in URL
+                quiz: currentQuiz            // Send new data including new title
+            });
+        } else {
+            await addQuiz({
+                courseTitle,
+                quiz: currentQuiz
+            });
         }
-    } else {
-        // Add new quiz
-        currentCourse.quizzes.push(currentQuiz);
+        
+        hideQuizModal();
+        loadQuizzes();
+        alert('Quiz saved successfully!');
+    } catch (error) {
+        console.error('Error saving quiz:', error);
+        alert(`Failed to save quiz: ${error.message}`);
     }
-    
-    closeQuizModal();
-    loadQuizzes();
-    alert('Quiz saved successfully!');
 }
 
 // Save question to the current quiz
-function saveQuestion() {
-    const problem = document.getElementById('question-text').value;
-    const choiceInputs = document.querySelectorAll('.choice-text');
-    const correctRadio = document.querySelector('input[name="correct-choice"]:checked');
+function saveQuestionData(e) {
+    e.preventDefault();
     
-    const choices = Array.from(choiceInputs).map(input => input.value);
-    const answer = choices[parseInt(correctRadio.value)];
+    const problem = document.getElementById('question-text').value;
+    const choices = Array.from(document.querySelectorAll('.choice-text')).map(input => input.value);
+    const answerIndex = parseInt(document.querySelector('input[name="correct-choice"]:checked').value);
+    const answer = choices[answerIndex];
     
     const question = {
         problem,
@@ -359,21 +302,66 @@ function saveQuestion() {
         currentQuiz.questions.push(question);
     }
     
-    closeQuestionModal();
-    openQuizModal(true); // Reopen quiz modal to show updated questions
-}
-
-// Remove quiz from the course
-function removeQuiz() {
-    if (!currentQuiz) return;
-    
-    const quizIndex = currentCourse.quizzes.findIndex(q => q.title === currentQuiz.title);
-    if (quizIndex !== -1) {
-        currentCourse.quizzes.splice(quizIndex, 1);
-        loadQuizzes();
-        alert('Quiz removed successfully!');
+    hideQuestionModal();
+    if (isEditing) {
+        showEditQuizModal();
+    } else {
+        document.getElementById('question-list').innerHTML = '';
+        currentQuiz.questions.forEach((q, i) => {
+            const questionItem = document.createElement('div');
+            questionItem.className = 'question-item';
+            questionItem.innerHTML = `
+                <div class="question-actions">
+                    <button class="edit-question-btn" data-index="${i}" title="Edit"><i class="fas fa-edit"></i></button>
+                    <button class="remove-question-btn" data-index="${i}" title="Remove"><i class="fas fa-trash"></i></button>
+                </div>
+                <h4>${q.problem}</h4>
+                <ol class="question-choices">
+                    ${q.choices.map((choice, idx) => `
+                        <li class="${choice === q.answer ? 'correct-answer' : ''}">${choice}</li>
+                    `).join('')}
+                </ol>
+            `;
+            
+            questionItem.querySelector('.edit-question-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                showEditQuestionModal(parseInt(e.target.closest('button').dataset.index));
+            });
+            
+            questionItem.querySelector('.remove-question-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (confirm('Are you sure you want to remove this question?')) {
+                    currentQuiz.questions.splice(parseInt(e.target.closest('button').dataset.index), 1);
+                    questionItem.remove();
+                }
+            });
+            
+            document.getElementById('question-list').appendChild(questionItem);
+        });
     }
 }
 
-// Initialize the dashboard when DOM is loaded
-document.addEventListener('DOMContentLoaded', initDashboard);
+// Remove selected quiz
+async function removeSelectedQuiz() {
+    if (selectedQuizIndex === null) {
+        alert('Please select a quiz to remove');
+        return;
+    }
+    
+    if (!confirm(`Are you sure you want to remove the quiz "${quizzes[selectedQuizIndex].title}"?`)) {
+        return;
+    }
+    
+    try {
+        const courses = await GetCourseList();
+        const courseTitle = courses.result[currentCourseIndex].title;
+        const quizTitle = quizzes[selectedQuizIndex].title;
+        
+        await removeQuiz({ courseTitle, quizTitle });
+        loadQuizzes();
+        alert('Quiz removed successfully!');
+    } catch (error) {
+        console.error('Error removing quiz:', error);
+        alert(`Failed to remove quiz: ${error.message}`);
+    }
+}

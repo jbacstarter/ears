@@ -11,6 +11,11 @@ import { addModule, GetCourseList, removeModule } from "../Utilities/api.js";
 
         window.onload = async (e) =>{
             e.preventDefault();
+            const logout = document.querySelector("#logout-button");
+            logout.addEventListener("click", (e)=>{
+            window.location.href = "../auth/login.html";
+            sessionStorage.removeItem("user");
+            })
             const courses = await GetCourseList();
             // <option value="intro-psych">Introduction to Psychology</option>
             courses.result.forEach((el,index) =>{

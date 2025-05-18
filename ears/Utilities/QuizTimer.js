@@ -9,7 +9,7 @@ export default class QuizTimer {
   }
 
   start() {
-    this.updateDisplay(); // Initial display update
+    this.updateDisplay();
     this.timerInterval = setInterval(() => {
       this.updateTimer();
     }, 1000);
@@ -24,7 +24,6 @@ export default class QuizTimer {
     this.totalSeconds--;
     this.updateDisplay();
     
-    // Update visual warnings
     if (this.totalSeconds <= this.dangerThreshold) {
       this.displayElement.classList.add('danger');
       this.displayElement.classList.remove('warning');
@@ -34,10 +33,32 @@ export default class QuizTimer {
   }
 
   updateDisplay() {
-    const minutes = Math.floor(this.totalSeconds / 60);
-    let seconds = this.totalSeconds % 60;
-    seconds = seconds < 10 ? `0${seconds}` : seconds;
-    this.displayElement.textContent = `${minutes}:${seconds}`;
+    const timeData = this.calculateTimeUnits(this.totalSeconds);
+    this.displayElement.textContent = this.formatTimeString(timeData);
+  }
+
+  calculateTimeUnits(totalSeconds) {
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    
+    return { days, hours, minutes, seconds };
+  }
+
+  formatTimeString({ days, hours, minutes, seconds }) {
+    // Format seconds with leading zero
+    const formattedSec = seconds < 10 ? `0${seconds}` : seconds;
+    
+    if (days > 0) {
+      return `${days}d ${hours}h ${minutes}m ${formattedSec}s`;
+    } else if (hours > 0) {
+      return `${hours}h ${minutes}m ${formattedSec}s`;
+    } else if (minutes > 0) {
+      return `${minutes}m ${formattedSec}s`;
+    } else {
+      return `${formattedSec}s`;
+    }
   }
 
   timeUp() {
@@ -45,18 +66,14 @@ export default class QuizTimer {
     this.isTimeUp = true;
     this.displayElement.textContent = "00:00";
     this.displayElement.className = 'danger';
-    
-    // Automatically submit the quiz
     this.submitQuiz();
   }
 
   submitQuiz() {
-    // Disable all answer inputs
     document.querySelectorAll('.answer-radio').forEach(radio => {
       radio.disabled = true;
     });
     
-    // Show time's up message
     const warning = document.createElement('div');
     warning.className = 'time-up-warning';
     warning.innerHTML = `
@@ -64,8 +81,5 @@ export default class QuizTimer {
       Time's up! Your answers will be submitted automatically.
     `;
     document.querySelector('.quiz-header').appendChild(warning);
-    
-    // Trigger your quiz submission logic here
-    // submitQuizAnswers();
   }
 }

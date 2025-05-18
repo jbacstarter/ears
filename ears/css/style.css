@@ -286,6 +286,8 @@ button.add-btn {
     gap: 1.5rem;
 }
 
+
+
 .module-card {
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -1125,34 +1127,36 @@ a.button:hover {
 }
 
 
-.module-information {
+
+/* .module-information {
     min-height: 100vh;
     width: 95%;
     background-color: rgba(255, 255, 255, 0.8);
-    /* background-color:FAEDCA; */
+     background-color:FAEDCA; 
     margin: 20px;
-}
-
+}*
 .module-information h1 {
     width: 100%;
     word-wrap: break-word;
-    overflow-wrap: break-word; /* Let long words wrap */
-    white-space: normal; /* Allow text to break to new lines */
+    overflow-wrap: break-word;
+    white-space: normal;
     text-align: justify;
 }
 .module-information p {
     width: 100%;
     min-height: 100%;
     word-wrap: break-word;
-    overflow-wrap: break-word; /* Let long words wrap */
-    white-space: normal; /* Allow text to break to new lines */
+    overflow-wrap: break-word;
+    white-space: normal;
 
     text-align: justify;
     font-family: 'Times New Roman', Times, serif;
     font-size: 20px;
     margin-top: 20px;
 }
-
+.module-information button {
+    width: 10vh;
+} */
 
 
 
@@ -1353,3 +1357,259 @@ a.button:hover {
 
 
 
+/* Main Content Styles */
+.content {
+    padding: 20px;
+}
+
+.welcome-banner {
+    background: linear-gradient(135deg, #4a6cf7 0%, #2541b2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.welcome-banner h1 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.user-progress {
+    margin: 5px 0 0;
+    opacity: 0.9;
+}
+
+/* Dashboard Sections */
+.dashboard-sections {
+    display: grid;
+    gap: 20px;
+}
+
+.dashboard-section {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.dashboard-section h2 {
+    margin-top: 0;
+    color: #333;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Progress Circles */
+.progress-circles {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.progress-circle {
+    text-align: center;
+}
+
+.circle {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: conic-gradient(#4CAF50 calc(var(--percent)*1%), #e0e0e0 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+}
+
+.circle span {
+    background: white;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* Course Cards */
+.course-cards {
+    display: grid;
+    gap: 15px;
+}
+
+.course-card {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.course-card h3 {
+    margin-top: 0;
+}
+
+.progress-bar {
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.progress-bar .progress {
+    height: 100%;
+    background: #4CAF50;
+    border-radius: 4px;
+}
+
+.course-stats {
+    display: flex;
+    justify-content: space-between;
+    color: #666;
+    font-size: 0.9rem;
+    margin: 10px 0;
+}
+
+.continue-btn {
+    width: 100%;
+    padding: 8px;
+    background: #4a6cf7;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Quick Actions */
+.action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    background: #e9ecef;
+}
+
+.action-btn i {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+    color: #4a6cf7;
+}
+
+.action-btn span {
+    font-size: 0.9rem;
+}
+
+
+.module-information {
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.module-header {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+}
+
+.module-header h1 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.module-progress {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.module-content {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.module-text {
+    line-height: 1.6;
+    color: #34495e;
+    margin-bottom: 2rem;
+}
+
+.module-text p {
+    margin: 0 0 1.5rem 0;
+        width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    text-align: justify;
+}
+
+.done-button {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.done-button:hover {
+    background: #2ecc71;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.done-button:active {
+    transform: translateY(0);
+}
+
+.done-button i {
+    font-size: 1.2rem;
+}
+
+.done-button.completed {
+    background: #3498db;
+    pointer-events: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .module-information {
+        padding: 1rem;
+    }
+    
+    .module-content {
+        padding: 1.5rem;
+    }
+    
+    .done-button {
+        width: 100%;
+        justify-content: center;
+    }
+}

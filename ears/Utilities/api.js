@@ -202,3 +202,127 @@ export const removeModule = async (data) =>{
   }
 }
 
+
+export const addQuiz = async ({ courseTitle, quiz }) => {
+    try {
+        const response = await fetch(`${HOST}/ears/${encodeURIComponent(courseTitle)}/quizzes`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                title: quiz.title,
+                timeLimit: quiz.timeLimit,
+                questions: quiz.questions || []
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to add quiz');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error adding quiz:', error);
+        throw error;
+    }
+};
+
+export const removeQuiz = async ({ courseTitle, quizTitle }) => {
+    try {
+        const response = await fetch(`${HOST}/ears/${encodeURIComponent(courseTitle)}/quizzes/${encodeURIComponent(quizTitle)}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to remove quiz');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error removing quiz:', error);
+        throw error;
+    }
+};
+
+export const updateQuiz = async ({ courseTitle, quizTitle, quiz }) => {
+    try {
+        const response = await fetch(`${HOST}/ears/${encodeURIComponent(courseTitle)}/quizzes/${encodeURIComponent(quizTitle)}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                title: quiz.title,
+                timeLimit: quiz.timeLimit,
+                questions: quiz.questions || []
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to update quiz');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error updating quiz:', error);
+        throw error;
+    }
+};
+
+// Utility function to handle API errors
+const handleApiError = (error) => {
+    console.error('API Error:', error);
+    throw error;
+};
+
+
+export const GetInfoSummary = async (user) =>{
+    const details ={};
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+ 
+  const requestOptions = {
+    method: "GET",
+    headers: myHeaders,
+    redirect: "follow"
+  };
+  try {
+    const response = await fetch(`${HOST}/ears/info/dashboard?email=${user}`, requestOptions);
+    details.result = await response.json();
+  } catch (error) {
+    details.result = 0
+  }
+
+  return details;
+}
+
+export async function ModuleStatus(email, courseTitle, moduleTitle, status) {
+    try {
+        const response = await fetch(`${HOST}/ears/info/module-status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email,
+                courseTitle: courseTitle,
+                moduleTitle: moduleTitle,
+                status: status
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update module status');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+}

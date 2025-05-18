@@ -1,3 +1,80 @@
+export const dashb =  `<div class="welcome-banner">
+        <h1>Welcome, <span class="user-name">John</span></h1>
+        <p class="user-progress">You've completed <span class="completed-count">6</span> of <span class="total-modules">12</span> modules</p>
+    </div>
+
+    <div class="dashboard-sections">
+        <!-- Current Progress Section -->
+        <section class="dashboard-section progress-section">
+            <h2><i class="fas fa-chart-line"></i> Your Progress</h2>
+            <div class="progress-circles">
+                <div class="progress-circle">
+                    <div class="circle" style="--percent:60">
+                        <span>60%</span>
+                    </div>
+                    <p>Overall Completion</p>
+                </div>
+                <div class="progress-circle">
+                    <div class="circle" style="--percent:40">
+                        <span>40%</span>
+                    </div>
+                    <p>Avg Quiz Score</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Active Courses Section -->
+        <section class="dashboard-section courses-section">
+            <h2><i class="fas fa-book-open"></i> Your Courses</h2>
+            <div class="course-cards">
+                <div class="course-card">
+                    <h3>Introduction to Psychology</h3>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 60%"></div>
+                    </div>
+                    <div class="course-stats">
+                        <span><i class="fas fa-check"></i> 4/6 modules</span>
+                        <span><i class="fas fa-star"></i> 2/3 quizzes</span>
+                    </div>
+                    <button class="continue-btn">Continue</button>
+                </div>
+                <div class="course-card">
+                    <h3>Introduction to Computer Science</h3>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 30%"></div>
+                    </div>
+                    <div class="course-stats">
+                        <span><i class="fas fa-check"></i> 2/5 modules</span>
+                        <span><i class="fas fa-star"></i> 1/2 quizzes</span>
+                    </div>
+                    <button class="continue-btn">Continue</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions Section -->
+        <section class="dashboard-section actions-section">
+            <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+            <div class="action-buttons">
+                <button class="action-btn">
+                    <i class="fas fa-play"></i>
+                    <span>Continue Learning</span>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Take a Quiz</span>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-search"></i>
+                    <span>Find Courses</span>
+                </button>
+                <button class="action-btn">
+                    <i class="fas fa-trophy"></i>
+                    <span>View Achievements</span>
+                </button>
+            </div>
+        </section>
+    </div>`;
 export const sprofile = `
         <h1>User Profile</h1>
         <section class="profile-section">

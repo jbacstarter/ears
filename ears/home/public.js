@@ -1,4 +1,4 @@
-import { AccountInfo, GetCourse, GetCourseList, UpdateScore } from "../Utilities/api.js";
+import { AccountInfo, GetCourse, GetCourseList, GetInfoSummary, ModuleStatus, UpdateScore } from "../Utilities/api.js";
 import { checkAnswers } from "../Utilities/checkAnswers.js";
 import QuizTimer from "../Utilities/QuizTimer.js";
 import { logout } from "./logout.js";
@@ -25,21 +25,93 @@ window.addEventListener("DOMContentLoaded",async (e) =>{
     await updateDashboard();
 })
 const updateDashboard = async () => {
-        clearActiveClass();
+    clearActiveClass();
     document.querySelector(".dashboard").classList.add("active");
-    const content = document.querySelector(".main-content-area main");
-    content.classList.remove("cardContainer");
-    content.classList.remove("course-content")
-    content.classList.add("content")
-    content.innerHTML = shome;
-    const details = (await AccountInfo(getUser())).result;
-    const mcompleted = document.querySelector("#modules-completed");
-    const avg = document.querySelector("#average-score");
-    mcompleted.textContent = details.mcompleted;
-    avg.textContent = details.avgscore + "%";
-    logout();
-    history.pushState({}, "", "dashboard");
+    const parent = document.querySelector(".main-content-area")
+    const tempContent = document.querySelector(".main-content-area main");
+    if(tempContent){
+        parent.removeChild(tempContent);
+    }
+    const {result} = await GetInfoSummary(getUser());
+    console.log(result);
+    const {progress, userInfo, courses} = result;
+    const content = document.createElement("main");
+    content.classList.add("content");
+    content.innerHTML +=
+    `    
+    <div class="welcome-banner">
+        <h1>Welcome, <span class="user-name">${userInfo.name}</span></h1>
+        <p class="user-progress">You've completed <span class="completed-count">${progress.completedModules}</span> of <span class="total-modules">${progress.totalModules}</span> modules</p>
+    </div>
+
+    <div class="dashboard-sections">
+        <!-- Current Progress Section -->
+        <section class="dashboard-section progress-section">
+            <h2><i class="fas fa-chart-line"></i> Your Progress</h2>
+            <div class="progress-circles">
+                <div class="progress-circle">
+                    <div class="circle" style="--percent:${progress.overallCompletion}">
+                        <span>${progress.overallCompletion}%</span>
+                    </div>
+                    <p>Overall Completion</p>
+                </div>
+                <div class="progress-circle">
+                    <div class="circle" style="--percent:${progress.averageScore}">
+                        <span>${progress.averageScore}%</span>
+                    </div>
+                    <p>Avg Quiz Score</p>
+                </div>
+            </div>
+        </section>
+    </div>
+    `
+    const courseProgress =`
+        <section class="dashboard-section courses-section">
+            <h2><i class="fas fa-book-open"></i> Available Courses</h2>
+            <div class="course-cards">
+                ${courses.map((el)=>{
+                    const temp =
+                    `
+                    <div class="course-card">
+                    <h3>${el.title}</h3>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: ${el.modules.completionPercentage}%"></div>
+                    </div>
+                    <div class="course-stats">
+                        <span><i class="fas fa-check"></i> ${el.modules.completed}/${el.modules.total} modules</span>
+                        <span><i class="fas fa-star"></i> ${el.quizzes.completed}/${el.quizzes.total}</span>
+                    </div>
+                    <button class="continue-btn">Continue</button>
+                </div>
+                    `
+                    return temp;
+                }).join('')}
+            </div>
+        </section>`
+    content.innerHTML += courseProgress;
+    parent.appendChild(content);
+    courses.forEach((el, index) => {
+        const arr = content.querySelectorAll(".continue-btn");
+        arr[index].addEventListener("click", (e)=>{
+        e.preventDefault();
+        clearActiveClass();
+        document.querySelector(".training-modules").classList.add("active");;
+        showCourse(el.title);
+        })
+    });
 }
+// const content = document.querySelector(".main-content-area main");
+// content.classList.remove("cardContainer");
+// content.classList.remove("course-content")
+// content.classList.add("content")
+// content.innerHTML = shome;
+// const details = (await AccountInfo(getUser())).result;
+// const mcompleted = document.querySelector("#modules-completed");
+// const avg = document.querySelector("#average-score");
+// mcompleted.textContent = details.mcompleted;
+// avg.textContent = details.avgscore + "%";
+// logout();
+// history.pushState({}, "", "dashboard");
 dashboard.addEventListener("click", async (e) =>{
     e.preventDefault();
     updateDashboard();
@@ -178,7 +250,7 @@ const showCourse = async (courseTitle) => {
         mCard.classList.add("module_card");
         title.textContent = info.result.modules[i].title
         title.addEventListener("click", (e) =>{
-            showModule(info, i);
+            showModule(info, courseTitle,i);
         })
         
         mCard.appendChild(title);
@@ -216,21 +288,42 @@ const showCourse = async (courseTitle) => {
 
 }
 
-const showModule = (info, index) => {
-            const parent =  document.querySelector('.main-content-area');
-            const oldContent = document.querySelector(".main-content-area main");   
-            if (oldContent) {
-            parent.removeChild(oldContent);
-            }   
-            const moduleBody = document.createElement("main");
-            moduleBody.classList.add("module-information");
-            const title = document.createElement("h1");
-            const body = document.createElement("p");
-            body.textContent = info.result.modules[index].body;
-            title.textContent = info.result.modules[index].title;
-            moduleBody.appendChild(title)
-            moduleBody.appendChild(body)
-            parent.appendChild(moduleBody);
+const showModule = (info, courseTitle,index) => {
+    const parent = document.querySelector('.main-content-area');
+    const oldContent = document.querySelector(".main-content-area main");   
+    if (oldContent) {
+        parent.removeChild(oldContent);
+    }   
+    
+    const moduleBody = document.createElement("main");
+    moduleBody.classList.add("module-information");
+    moduleBody.innerHTML = `
+        <div class="module-header">
+            <h1>${info.result.modules[index].title}</h1>
+            <div class="module-progress">Module ${index + 1} of ${info.result.modules.length}</div>
+        </div>
+        
+        <div class="module-content">
+            <div class="module-text">
+                <p>${info.result.modules[index].body}</p>
+            </div>
+            
+            <div class="module-actions">
+                <button class="done-button">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Mark as Completed</span>
+                </button>
+            </div>
+        </div>
+    `;
+        const doneButton = moduleBody.querySelector('.done-button');
+    doneButton.addEventListener('click', () => {
+       ModuleStatus(getUser(), courseTitle,info.result.modules[index].title,true);
+        doneButton.innerHTML = '<i class="fas fa-check"></i> Completed!';
+        doneButton.classList.add('completed');
+        updateDashboard();
+    });
+    parent.appendChild(moduleBody);
 }
 
 const showQuiz = (info,index) => {
