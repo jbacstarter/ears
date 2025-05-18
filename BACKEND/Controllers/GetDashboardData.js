@@ -1,14 +1,12 @@
 const { getDB } = require("../database");
 
-const getDashboardData = async (req, res) => {
+const GetDashboardData = async (req, res) => {
     try {
         const db = getDB();
         const query = {
             email: { $eq: req.query.email }
         };
-        
-        // Fetch user data from MongoDB
-        const user = await db.collection("info").findOne(query);
+        const user = db? await db.collection("info").findOne(query) : null;
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -28,7 +26,7 @@ const getDashboardData = async (req, res) => {
                 overallCompletion: 0,
                 averageScore: 0
             },
-            courses: [],
+            courses: []
         };
 
         // Process each course
@@ -103,4 +101,4 @@ const getDashboardData = async (req, res) => {
     }
 };
 
-module.exports = { getDashboardData };
+module.exports = { GetDashboardData };

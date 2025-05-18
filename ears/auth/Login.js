@@ -1,5 +1,7 @@
 
 import { CheckLogin } from "../Utilities/api.js";
+import { hideLoading, showLoading } from "../Utilities/loader.js";
+import { showNotification } from "../Utilities/notification.js";
 
 const form = document.getElementById("login-form");
 
@@ -13,31 +15,32 @@ form.addEventListener("submit", async (e) =>{
     formData.forEach((value, key) => {
       data[key] = value;
     })
+
     if(email === data.email && password === data.password){
       sessionStorage.setItem("user", email);
       setTimeout(() => {
       window.location.href = "../admin/modules.html";
       }, 2000);
-    }else {
+    }
+    
+    else {
       const details = await CheckLogin(data);
       const status = details.status;
       const text = details.text;
 
     if(status != 200){
-      console.error("Status: "+ status+"\nResponse: "+text)
-      alert("ERROR"+"\nStatus: "+ status+"\nResult: "+text)
+      showNotification("Email or Password Incorrect", "warning");
     }else if(status == 400){
-      console.error("Status: "+ status+"\nResponse: "+text)
-      alert("ERROR"+"\nStatus: "+ status+"\nResult: "+text)
+      showNotification("Internal Server Error...", "error");
     }else {
-      console.log("Status: "+ status+"\nResponse: "+text)
-      alert("Status: "+ status+"\nResult: "+text)
-
-    sessionStorage.setItem("user", data.email);
-    setTimeout(() => {
+      showNotification("Signing in...", "success");
+      sessionStorage.setItem("user", data.email);
+      showLoading();
+      setTimeout(() => {
+        hideLoading();
       window.location.href = "../home/dashboard.html"
-  }, 2000);
-}
+      }, 2000);
+    }
     }
  
 });

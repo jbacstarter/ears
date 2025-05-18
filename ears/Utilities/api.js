@@ -1,3 +1,5 @@
+import { showNotification } from "./notification.js";
+
 const HOST = "http://localhost:3000";
 
 export const CheckLogin = async (user) =>{
@@ -23,7 +25,8 @@ export const CheckLogin = async (user) =>{
     details.status = response.status;
   } catch (error) {
     details.text = "Connection To Server Not Found";
-    details.status = 404; // or -1, since error object doesn't have a status
+    details.status = 404;
+    showNotification("Connection To Server Not Found" ,"error")
   }
 
   return details;
@@ -52,7 +55,8 @@ export const RegisterAccount = async (user) =>{
     details.status = response.status;
   } catch (error) {
     details.text = "Connection To Server Not Found";
-    details.status = 404; // or -1, since error object doesn't have a status
+    details.status = 404; 
+    showNotification("Connection To Server Not Found" ,"error")
   }
 
   return details;
@@ -73,6 +77,7 @@ export const AccountInfo = async (user) =>{
     details.result = await response.json();
   } catch (error) {
     details.result = 0
+    showNotification("Connection To Server Not Found" ,"error")
   }
 
   return details;
@@ -99,7 +104,7 @@ export const initAccount = async (user) =>{
     const text = await response.text();
     console.log(response.status);
   } catch (error) {
-    console.log(error);
+   showNotification("Connection To Server Not Found" ,"error")
   }
 }
 
@@ -118,6 +123,7 @@ export const GetCourse = async (user, courseTitle) =>{
     details.result = await response.json();
   } catch (error) {
     details.result = 0
+    showNotification("Connection To Server Not Found" ,"error")
   }
   
   return details;
@@ -138,8 +144,8 @@ export const GetCourseList = async () =>{
     const response = await fetch(`${HOST}/ears/info/courselist`, requestOptions);
     details.result = await response.json();
   } catch (error) {
-    console.log(error);
     details = 0;
+    showNotification("Connection To Server Not Found" ,"error")
   }
   return details;
 }
@@ -180,7 +186,7 @@ export const addModule = async (data) =>{
     const text = await response.json();
     return text.status;
   } catch (error) {
-    console.log(error);
+    showNotification("Connection To Server Not Found" ,"error")
   }
 }
 export const removeModule = async (data) =>{
@@ -198,7 +204,7 @@ export const removeModule = async (data) =>{
     const text = await response.json();
     return text.status;
   } catch (error) {
-    console.log(error);
+    showNotification("Connection To Server Not Found" ,"error")
   }
 }
 
@@ -223,7 +229,7 @@ export const addQuiz = async ({ courseTitle, quiz }) => {
         }
         return await response.json();
     } catch (error) {
-        console.error('Error adding quiz:', error);
+        showNotification("Connection To Server Not Found" ,"error")
         throw error;
     }
 };
@@ -243,7 +249,7 @@ export const removeQuiz = async ({ courseTitle, quizTitle }) => {
         }
         return await response.json();
     } catch (error) {
-        console.error('Error removing quiz:', error);
+        showNotification("Connection To Server Not Found" ,"error")
         throw error;
     }
 };
@@ -268,7 +274,7 @@ export const updateQuiz = async ({ courseTitle, quizTitle, quiz }) => {
         }
         return await response.json();
     } catch (error) {
-        console.error('Error updating quiz:', error);
+        showNotification("Connection To Server Not Found" ,"error")
         throw error;
     }
 };
@@ -295,6 +301,7 @@ export const GetInfoSummary = async (user) =>{
     details.result = await response.json();
   } catch (error) {
     details.result = 0
+    showNotification("Connection To Server Not Found" ,"error")
   }
 
   return details;
@@ -322,7 +329,47 @@ export async function ModuleStatus(email, courseTitle, moduleTitle, status) {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error('Error:', error);
+        showNotification("Connection To Server Not Found" ,"error")
         throw error;
+    }
+}
+
+
+export async function updateProfile(updatedData) {
+    try {
+        // Get the current user's email (you'll need to implement getUserEmail())
+        const {userEmail,name,gender,address} = updatedData; // Or get it from your auth system
+        
+        // Prepare the request
+        const response = await fetch(`${HOST}/ears/profile/${userEmail}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json' // If using JWT
+            },
+            body: JSON.stringify({
+                name: name,
+                gender: gender,
+                address: address
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to update profile');
+        }
+
+        const data = await response.json();
+        return {
+            success: true,
+            message: data.message,
+            updatedFields: data.updatedFields
+        };
+
+    } catch (error) {
+        showNotification("Connection To Server Not Found" ,"error")
+        return {
+            success: false,
+            message: error.message
+        };
     }
 }

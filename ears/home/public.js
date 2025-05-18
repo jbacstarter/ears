@@ -1,8 +1,13 @@
-import { AccountInfo, GetCourse, GetCourseList, GetInfoSummary, ModuleStatus, UpdateScore } from "../Utilities/api.js";
+import { AccountInfo, GetCourse, GetCourseList, GetInfoSummary, ModuleStatus, updateProfile, UpdateScore } from "../Utilities/api.js";
 import { checkAnswers } from "../Utilities/checkAnswers.js";
+import { hideLoading, showLoading } from "../Utilities/loader.js";
+import { showNotification } from "../Utilities/notification.js";
 import QuizTimer from "../Utilities/QuizTimer.js";
 import { logout } from "./logout.js";
-import { modules, shome, sprofile } from "./static.js";
+
+window.onload = (e) =>{
+    logout();
+}
 
 
 const getUser = () =>{
@@ -22,8 +27,23 @@ const clearActiveClass = ()=>{
     })
 }
 window.addEventListener("DOMContentLoaded",async (e) =>{
-    await updateDashboard();
+    showLoading()
+    setTimeout(() => {
+    updateDashboard();
+    hideLoading();
+    }, 2500);
 })
+
+dashboard.addEventListener("click", async (e) =>{
+    e.preventDefault();
+    showLoading()
+    setTimeout(() => {
+    updateDashboard();
+    hideLoading();
+    }, 2500);
+})
+
+
 const updateDashboard = async () => {
     clearActiveClass();
     document.querySelector(".dashboard").classList.add("active");
@@ -33,7 +53,6 @@ const updateDashboard = async () => {
         parent.removeChild(tempContent);
     }
     const {result} = await GetInfoSummary(getUser());
-    console.log(result);
     const {progress, userInfo, courses} = result;
     const content = document.createElement("main");
     content.classList.add("content");
@@ -63,10 +82,7 @@ const updateDashboard = async () => {
                 </div>
             </div>
         </section>
-    </div>
-    `
-    const courseProgress =`
-        <section class="dashboard-section courses-section">
+                <section class="dashboard-section courses-section">
             <h2><i class="fas fa-book-open"></i> Available Courses</h2>
             <div class="course-cards">
                 ${courses.map((el)=>{
@@ -87,7 +103,10 @@ const updateDashboard = async () => {
                     return temp;
                 }).join('')}
             </div>
-        </section>`
+        </section>
+    </div>
+    `
+    const courseProgress =``
     content.innerHTML += courseProgress;
     parent.appendChild(content);
     courses.forEach((el, index) => {
@@ -95,86 +114,194 @@ const updateDashboard = async () => {
         arr[index].addEventListener("click", (e)=>{
         e.preventDefault();
         clearActiveClass();
-        document.querySelector(".training-modules").classList.add("active");;
-        showCourse(el.title);
+        document.querySelector(".training-modules").classList.add("active");
+        showLoading()
+        setTimeout(() => {
+            showCourse(el.title);
+            hideLoading();
+            }, 1500);
         })
     });
 }
-// const content = document.querySelector(".main-content-area main");
-// content.classList.remove("cardContainer");
-// content.classList.remove("course-content")
-// content.classList.add("content")
-// content.innerHTML = shome;
-// const details = (await AccountInfo(getUser())).result;
-// const mcompleted = document.querySelector("#modules-completed");
-// const avg = document.querySelector("#average-score");
-// mcompleted.textContent = details.mcompleted;
-// avg.textContent = details.avgscore + "%";
-// logout();
-// history.pushState({}, "", "dashboard");
-dashboard.addEventListener("click", async (e) =>{
-    e.preventDefault();
-    updateDashboard();
-})
 
-profile.addEventListener("click", async (e) =>{
+
+profile.addEventListener("click", async (e) => {
     e.preventDefault();
-    clearActiveClass();
+    showLoading()
+    setTimeout(() => {
+    updateProfilePage();
+    hideLoading();
+    }, 1500);
+});
+
+const updateProfilePage = async () =>{
+   clearActiveClass();
     document.querySelector(".profile").classList.add("active");
     const parent = document.querySelector(".main-content-area")
     const tempContent = document.querySelector(".main-content-area main");
     if(tempContent){
         parent.removeChild(tempContent);
     }
+    const {address, gender, email, name} = (await AccountInfo(getUser())).result;
 
     const content = document.createElement("main");
     content.classList.add("content");
-    content.innerHTML = sprofile;
-    parent.appendChild(content)
-    const details = (await AccountInfo(getUser())).result;
-    const obj = {
-        name:"",email:"", gender:"",address:""
-    }
-    for(const key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-            const doc = document.querySelector(`#${key}`);
-            doc.innerHTML = "";
-            const str =document.createElement("strong");
-            str.textContent = `${key.toUpperCase()}: `; 
-            doc.appendChild(str);
-            doc.innerHTML += `${details[key]}`
+    content.innerHTML = `
+        <div class="profile-container">
+            <div class="profile-header">
+                <h1>My Profile</h1>
+                <button class="edit-btn" id="editProfileBtn">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </button>
+            </div>
             
-        }
-    }
-        logout();
-        history.pushState({}, "", "profile");
-
-})
-
-
-// tm.addEventListener("click", (e) => {
-//     e.preventDefault();
-//     clearActiveClass();
-//     document.querySelector(".training-modules").classList.add("active");
-//      const container = document.querySelector(".employee-dashboard-layout")
-//      container.removeChild(document.querySelector('.main-content-area'));
-//      const temp = document.createElement("div");
-//      temp.classList.add("main-content-area")
-//      temp.innerHTML = modules;
-//      container.appendChild(temp);
-//      logout();
-// });
-                /*<main class="content cardContainer">
-                <div class="card">
-                    <div class="card-content">
-                        <h1>Title</h1>
-                        <h2>Course Code</h2>
-                        <h3>Description</h3>
-                    </div>
+            <div class="profile-details">
+                <div class="detail-row">
+                    <div class="detail-label">Full Name:</div>
+                    <div class="detail-value" id="name">${name}</div>
                 </div>
-            </main>*/
+                
+                <div class="detail-row">
+                    <div class="detail-label">Email:</div>
+                    <div class="detail-value" id="email">${email}</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Gender:</div>
+                    <div class="detail-value" id="gender">${gender}</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Address:</div>
+                    <div class="detail-value" id="address">${address}</div>
+                </div>
+                
+                <div class="save-cancel-btns" id="actionButtons">
+                    <button class="cancel-btn" id="cancelEditBtn">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button class="save-btn" id="saveChangesBtn">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+ parent.appendChild(content);
+
+    // Initialize profile editing functionality
+    const editBtn = document.getElementById('editProfileBtn');
+    const cancelBtn = document.getElementById('cancelEditBtn');
+    const saveBtn = document.getElementById('saveChangesBtn');
+    const actionButtons = document.getElementById('actionButtons');
+    
+    // Hide action buttons initially
+    actionButtons.style.display = 'none';
+    
+    // Fields that can be edited
+    const editableFields = ['name', 'email', 'gender', 'address'];
+    let originalValues = {};
+    
+    editBtn.addEventListener('click', function() {
+        // Store original values
+        editableFields.forEach(field => {
+            originalValues[field] = document.getElementById(field).textContent.trim();
+            
+            // Replace text with input fields
+            if (field === 'gender') {
+                // Create select for gender
+                const select = document.createElement('select');
+                select.id = `${field}-input`;
+                select.innerHTML = `
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                `;
+                select.value = originalValues[field];
+                document.getElementById(field).innerHTML = '';
+                document.getElementById(field).appendChild(select);
+            } else {
+                const input = document.createElement('input');
+                input.type = field === 'email' ? 'email' : 'text';
+                input.id = `${field}-input`;
+                input.value = originalValues[field];
+                document.getElementById(field).innerHTML = '';
+                document.getElementById(field).appendChild(input);
+            }
+        });
+        
+        // Show action buttons
+        actionButtons.style.display = 'flex';
+        // Hide edit button
+        editBtn.style.display = 'none';
+    });
+    cancelBtn.addEventListener('click', function() {
+        // Restore original values
+            showLoading()
+            setTimeout(() => {
+            editableFields.forEach(field => {
+                document.getElementById(field).innerHTML = originalValues[field];
+            });
+
+            // Hide action buttons
+            actionButtons.style.display = 'none';
+            // Show edit button
+            
+            editBtn.style.display = 'block';
+            hideLoading();
+            }, 500);
+            showNotification("Canceled...", "error");
+    });
+    
+    saveBtn.addEventListener('click', async function() {
+        // Get updated values
+        const updatedValues = {};
+        editableFields.forEach(field => {
+            const inputElement = document.getElementById(`${field}-input`);
+            updatedValues[field] = inputElement.value;
+            
+            document.getElementById(field).innerHTML = updatedValues[field];
+        });
+        
+        try {
+            // Call your API to update the profile
+            showLoading();
+            setTimeout(async () => {
+                const response = await updateProfile({...updatedValues, userEmail: getUser() });
+                hideLoading();
+            }, 2500);
+                
+            if (response.success) {
+                actionButtons.style.display = 'none';
+                editBtn.style.display = 'block';
+                
+                showNotification("Profile updated successfully!", "success")
+            } else {
+                throw new Error(response.message || 'Failed to update profile');
+            }
+        } catch (error) {
+            showNotification("Failed to update profile", "error");
+            editableFields.forEach(field => {
+                document.getElementById(field).innerHTML = originalValues[field];
+            });
+            
+            actionButtons.style.display = 'none';
+            editBtn.style.display = 'block';
+        }
+    });
+}
+
 tm.addEventListener("click", async (e) =>{
-    e.preventDefault()
+    e.preventDefault();
+    showLoading()
+    setTimeout(() => {
+    updateModulesPage();
+    hideLoading();
+    }, 1500);
+})
+const updateModulesPage = async() => {
     clearActiveClass();
     document.querySelector(".training-modules").classList.add("active");
 
@@ -203,17 +330,59 @@ tm.addEventListener("click", async (e) =>{
         
         cardContainer.appendChild(card);
         card.addEventListener("click", (e) =>{
+        showLoading()
+        setTimeout(() => {
             showCourse(courseTitle);
+            hideLoading()
+            }, 1500);
         })
     }
-
     parent.appendChild(cardContainer);
-    logout();
-    history.pushState({}, "", "courses");
-})
+}
 
+// content.innerHTML = sprofile;
+// parent.appendChild(content)
+// const details = (await AccountInfo(getUser())).result;
+// const obj = {
+//     name:"",email:"", gender:"",address:""
+// }
+// for(const key in obj) {
+//     if (Object.prototype.hasOwnProperty.call(obj, key)) {
+//         const doc = document.querySelector(`#${key}`);
+//         doc.innerHTML = "";
+//         const str =document.createElement("strong");
+//         str.textContent = `${key.toUpperCase()}: `; 
+//         doc.appendChild(str);
+//         doc.innerHTML += `${details[key]}`
+        
+//     }
+// }
+//     logout();
+//     history.pushState({}, "", "profile");
+
+// tm.addEventListener("click", (e) => {
+//     e.preventDefault();
+//     clearActiveClass();
+//     document.querySelector(".training-modules").classList.add("active");
+//      const container = document.querySelector(".employee-dashboard-layout")
+//      container.removeChild(document.querySelector('.main-content-area'));
+//      const temp = document.createElement("div");
+//      temp.classList.add("main-content-area")
+//      temp.innerHTML = modules;
+//      container.appendChild(temp);
+//      logout();
+// });
+                /*<main class="content cardContainer">
+                <div class="card">
+                    <div class="card-content">
+                        <h1>Title</h1>
+                        <h2>Course Code</h2>
+                        <h3>Description</h3>
+                    </div>
+                </div>
+            </main>*/
 /*
-            <main class="content   course-content">
+<main class="content   course-content">
                 <h1 class="posh1">Modules</h1>
                 <div class="module_header"></div>
                 <div class="module_card"></div>
@@ -250,7 +419,11 @@ const showCourse = async (courseTitle) => {
         mCard.classList.add("module_card");
         title.textContent = info.result.modules[i].title
         title.addEventListener("click", (e) =>{
+            showLoading()
+            setTimeout(() => {
             showModule(info, courseTitle,i);
+            hideLoading();
+            }, 1500);
         })
         
         mCard.appendChild(title);
@@ -279,8 +452,11 @@ const showCourse = async (courseTitle) => {
         content.appendChild(qCard);
 
         title.addEventListener("click", (e) =>{
-            showQuiz(info,i)
-        
+            showLoading()
+            setTimeout(() => {
+            showQuiz(info, i);
+            hideLoading();
+            }, 2500);
         })
     }
 
@@ -289,7 +465,10 @@ const showCourse = async (courseTitle) => {
 }
 
 const showModule = (info, courseTitle,index) => {
-    const parent = document.querySelector('.main-content-area');
+    if(info.result.modules[index].status){
+        // updateDashboard();
+    }else {
+        const parent = document.querySelector('.main-content-area');
     const oldContent = document.querySelector(".main-content-area main");   
     if (oldContent) {
         parent.removeChild(oldContent);
@@ -318,12 +497,19 @@ const showModule = (info, courseTitle,index) => {
     `;
         const doneButton = moduleBody.querySelector('.done-button');
     doneButton.addEventListener('click', () => {
-       ModuleStatus(getUser(), courseTitle,info.result.modules[index].title,true);
+        showLoading();
+        setTimeout(() => {
+            ModuleStatus(getUser(), courseTitle,info.result.modules[index].title,true);
+            hideLoading()
+        }, 1500);
+        showNotification("Module completed...", "success")
         doneButton.innerHTML = '<i class="fas fa-check"></i> Completed!';
         doneButton.classList.add('completed');
         updateDashboard();
     });
     parent.appendChild(moduleBody);
+    }
+    
 }
 
 const showQuiz = (info,index) => {
@@ -416,12 +602,17 @@ const showQuiz = (info,index) => {
             submitBtn.textContent = "Submit Assessment"; 
             submitBtn.addEventListener("click", (e) =>{
                 const res =  checkAnswers( answers, answerList);
-                submitQuiz(getUser(), info.result.title, info.result.quizzes[index].title,res);
+                showLoading();
+                setTimeout(() => {
+                    submitQuiz(getUser(), info.result.title, info.result.quizzes[index].title,res);
+                    hideLoading();
+                }, 2500);
+                showNotification("Quiz Submitted...", "success");
+                updateDashboard();
             })
             footer.appendChild(submitBtn);
             main.appendChild(footer);
 
-            // Append parent
             parent.appendChild(main);
         }
 }

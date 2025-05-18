@@ -48,38 +48,19 @@
             </header>
 
             <main class="content">
-                <h1>Training Dashboard</h1>
-
-                <section class="module-overview">
-                    <div class="module-card">
-                        <h3>POS Basics Training</h3>
-                        <p>0% Complete<w/p>
-                        <a href="#" class="button play-button"><i class="fa-solid fa-play"></i></a>
-                    </div>
-                    <div class="module-card">
-                        <h3>Customer Service Essentials</h3>
-                        <p>0% Complete</p>
-                         <a href="#" class="button play-button"><i class="fa-solid fa-play"></i></a>
-                    </div>
-                    <!-- Add more module cards as needed -->
-                </section>
-
-                <section class="performance-summary">
-                    <h2>Your Performance</h2>
-                    <div class="performance-metrics">
-                        <div class="metric">
-                            <span class="value" id="modules-completed">6</span>
-                            <span class="label">Modules Completed</span>
-                        </div>
-                        <div class="metric">
-                            <span class="value" id="average-score">NaN%</span>
-                            <span class="label">Average Score</span>
-                        </div>
-                    </div>
-                </section>
+                
             </main>
         </div>
     </div>
+
+<!-- LOADER -->
+    <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p class="loading-text">Loading...</p>
+    </div>
+    </div>
+        <div id="notificationContainer" class="notification-container"></div>
 <script type="module" src="public.js"></script>
 <script type="module" src="logout.js"></script>
 </body>

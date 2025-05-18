@@ -1,4 +1,6 @@
 import { initAccount, RegisterAccount } from "../Utilities/api.js";
+import { hideLoading, showLoading } from "../Utilities/loader.js";
+import { showNotification } from "../Utilities/notification.js";
 
 
 
@@ -18,16 +20,12 @@ const send = async (data)=>{
     const text = details.text;
 
     if(status != 200){
-      console.error("Status: "+ status+"\nResponse: "+text)
-      alert("ERROR"+"\nStatus: "+ status+"\nResult: "+text)
-      
+      showNotification("Account Already Exists...", "warning");
     }else if(status == 400){
-      console.error("Status: "+ status+"\nResponse: "+text)
-      alert("ERROR"+"\nStatus: "+ status+"\nResult: "+text)
-    }else if(status== 200){
-      console.log("Status: "+ status+"\nResponse: "+text)
-      await initAccount(data); // Initialize account information
-      alert("Status: "+ status+"\nResult: "+text)
+      showNotification("Internal Server Error...", "error");
+    }else if (status ==200){
+      showNotification("Registered...", "success");
+      await initAccount(data); 
     }
 }
 form.addEventListener("submit", async (e) =>{
@@ -38,6 +36,10 @@ form.addEventListener("submit", async (e) =>{
       formData.forEach((value, key) => {
       data[key] = value;
     })
-    await send(data);
+    showLoading();
+    setTimeout(async () => {
+      await send(data);
+      hideLoading();
+    }, 2500);
 });
 
