@@ -515,14 +515,14 @@ const showModule = (info, courseTitle,index) => {
         const doneButton = moduleBody.querySelector('.done-button');
     doneButton.addEventListener('click', async () => {
         showLoading();
-        setTimeout(() => {
-            ModuleStatus(getUser(), courseTitle,info.result.modules[index].title,true);
+        setTimeout(async () => {
+            await ModuleStatus(getUser(), courseTitle,info.result.modules[index].title,true);
             hideLoading()
+            await updateDashboard();
         }, 1500);
         showNotification("Module completed...", "success")
         doneButton.innerHTML = '<i class="fas fa-check"></i> Completed!';
         doneButton.classList.add('completed');
-        await updateDashboard();
     });
     parent.appendChild(moduleBody);
     

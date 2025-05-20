@@ -47,8 +47,12 @@ window.onload = async (e) => {
     e.preventDefault();
     const logout = document.querySelector("#logout-button");
     logout.addEventListener("click", (e)=>{
-    window.location.href = "../auth/login.html";
-    sessionStorage.removeItem("user");
+        showLoading();
+        setTimeout(() => {
+            window.location.href = "../auth/login.html";
+            sessionStorage.removeItem("user");
+            hideLoading()
+        }, 1500);
     })
     const courses = await GetCourseList();
     courses.result.forEach((course, index) => {
@@ -94,6 +98,7 @@ async function loadQuizzes() {
     if (!courseIndex) {
         showNotification("Select a course", "info")
         quizList.innerHTML = '<div class="placeholder-message"><p>Select a course to view or manage its quizzes.</p></div>';
+        hideLoading();
         return;
     }
     
@@ -105,7 +110,8 @@ async function loadQuizzes() {
     if (quizzes.length === 0) {
         showNotification("No quizzes", "info")
         quizList.innerHTML = '<div class="placeholder-message"><p>This course currently has no quizzes.</p></div>';
-        return;
+        hideLoading()
+        return; 
     }
     
     quizzes.forEach((quiz, index) => {
@@ -146,6 +152,7 @@ function showAddQuizModal() {
     showLoading();
     if (!courseSelect.value) {
         showNotification('Please select a course first', "info");
+        hideLoading();
         return;
     }
     
@@ -170,6 +177,7 @@ function editSelectedQuiz() {
     showLoading();
     if (selectedQuizIndex === null) {
         showNotification('Please select a quiz to edit', "info");
+        hideLoading();
         return;
     }
     
@@ -308,7 +316,7 @@ async function saveQuizData(e) {
         }
         
         hideQuizModal();
-        loadQuizzes();
+       await loadQuizzes();
         showNotification('Quiz saved successfully!', "success");
     } catch (error) {
         console.error('Error saving quiz:', error);
@@ -386,10 +394,12 @@ async function removeSelectedQuiz() {
     showLoading();
     if (selectedQuizIndex === null) {
         showNotification('Please select a quiz to remove');
+        hideLoading();
         return;
     }
     
     if (!confirm(`Are you sure you want to remove the quiz "${quizzes[selectedQuizIndex].title}"?`)) {
+        hideLoading();
         return;
     }
     
@@ -399,7 +409,7 @@ async function removeSelectedQuiz() {
         const quizTitle = quizzes[selectedQuizIndex].title;
         
         await removeQuiz({ courseTitle, quizTitle });
-        loadQuizzes();
+        await loadQuizzes();
         showNotification('Quiz removed successfully!',"success");
     } catch (error) {
         console.error('Error removing quiz:', error);

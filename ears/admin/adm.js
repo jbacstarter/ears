@@ -33,12 +33,12 @@ import { showNotification } from "../Utilities/notification.js";
             e.preventDefault();
             const logout = document.querySelector("#logout-button");
             logout.addEventListener("click", (e)=>{
-            showLoading()
+                showLoading();
             setTimeout(() => {
-                window.location.href = "../auth/login.html";
-                sessionStorage.removeItem("user");
+            window.location.href = "../auth/login.html";
+            sessionStorage.removeItem("user");
                 hideLoading();
-            }, 2500);
+            }, 1500);
                     
             })
             showCourseList();
@@ -57,10 +57,10 @@ import { showNotification } from "../Utilities/notification.js";
         // Event Listeners
         courseSelect.addEventListener('change', e =>{
                 showLoading();
-                setTimeout(() => {
                 loadModules();
+                setTimeout(() => {
                 hideLoading()
-            }, 2500);
+                }, 1500);
         });
         addModuleBtn.addEventListener('click', e =>{
             e.preventDefault();
@@ -68,7 +68,7 @@ import { showNotification } from "../Utilities/notification.js";
             setTimeout(() => {
             showAddModuleModal()
             hideLoading()
-            }, 2500);
+            }, 1500);
             
         });
         removeModuleBtn.addEventListener('click', e =>{
@@ -77,16 +77,16 @@ import { showNotification } from "../Utilities/notification.js";
             setTimeout(() => {
                 removeSelectedModule();
                 hideLoading();     
-            }, 2500);
+            }, 1500);
         });
             
-        moduleForm.addEventListener('submit', e => {
+        moduleForm.addEventListener('submit', async e => {
             e.preventDefault();
-        
+            showLoading();
+           await addNewModule();
             setTimeout(() => {
-                addNewModule();
-                hideLoading;
-            }, 2500);
+                hideLoading();
+            }, 1500);
         });
         cancelAddBtn.addEventListener('click', e =>{
             e.preventDefault();
@@ -94,7 +94,7 @@ import { showNotification } from "../Utilities/notification.js";
             setTimeout(() => {
                 hideAddModuleModal()
                 hideLoading()
-            }, 2500);    
+            }, 1500);    
             showNotification("Closed", "info");
 
         });
@@ -104,7 +104,7 @@ import { showNotification } from "../Utilities/notification.js";
                 setTimeout(() => {
                 hideAddModuleModal()
                 hideLoading()
-            }, 2500);    
+            }, 1500);    
             showNotification("Closed", "info");
         });
         // Functions
