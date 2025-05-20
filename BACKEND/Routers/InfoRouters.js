@@ -1,7 +1,9 @@
-    const { addModuleByTitle } = require("../Controllers/AddModule");
+    const { addCourse } = require("../Controllers/AddCourse");
+const { addModuleByTitle } = require("../Controllers/AddModule");
     const { addQuizByTitle } = require("../Controllers/addQuiz");
 const { GetDashboardData } = require("../Controllers/GetDashboardData");
     const { updateModuleStatus } = require("../Controllers/ModuleStatus");
+const { removeCourse } = require("../Controllers/RemoveCourse");
     const { removeModuleByTitle } = require("../Controllers/RemoveModule");
     const { removeQuizByTitle } = require("../Controllers/removeQuiz");
     const { updateProfile } = require("../Controllers/UpdateProfile");
@@ -30,5 +32,6 @@ const { GetDashboardData } = require("../Controllers/GetDashboardData");
     InfoRouter.delete('/:courseTitle/quizzes/:quizTitle', removeQuizByTitle);
     InfoRouter.put('/:courseTitle/quizzes/:quizTitle', updateQuizByTitle);
     InfoRouter.put('/profile/:email', updateProfile);
-
+    InfoRouter.post("/course", addCourse); // Add new course
+    InfoRouter.delete("/course/:title", removeCourse); // Remove course by title
     module.exports ={InfoRouter}

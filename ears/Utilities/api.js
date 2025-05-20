@@ -373,3 +373,52 @@ export async function updateProfile(updatedData) {
         };
     }
 }
+
+
+export async function addCourse(title) {
+  try {
+    const response = await fetch(`${HOST}/ears/course`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({title})
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to add course");
+    }
+
+    console.log("Course added:", data);
+    showNotification("Course added successfully!", "info");
+    return true;
+  } catch (error) {
+    console.error("Add course error:", error.message);
+    showNotification("Error adding course: " ,"error");
+    return false;
+  }
+}
+
+export async function removeCourse(title) {
+  try {
+    const response = await fetch(`${HOST}/ears/course/${encodeURIComponent(title)}`, {
+      method: "DELETE"
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to remove course");
+    }
+
+    console.log("Course removed:", data);
+    showNotification("Course removed successfully!", "info");
+    return true;
+  } catch (error) {
+    console.error("Remove course error:", error.message);
+    showNotification("Error removing course", "error" );
+    return false
+  }
+}

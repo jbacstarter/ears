@@ -1,4 +1,4 @@
-import { addModule, GetCourseList, removeModule } from "../Utilities/api.js";
+import { addCourse, addModule, GetCourseList, removeCourse, removeModule } from "../Utilities/api.js";
 import { formatText } from "../Utilities/fomatting.js";
 import { hideLoading, showLoading } from "../Utilities/loader.js";
 import { showNotification } from "../Utilities/notification.js";
@@ -41,7 +41,11 @@ import { showNotification } from "../Utilities/notification.js";
             }, 2500);
                     
             })
-            const courses = await GetCourseList();
+            showCourseList();
+        }
+
+        const showCourseList= async ()=>{
+                        const courses = await GetCourseList();
             // <option value="intro-psych">Introduction to Psychology</option>
             courses.result.forEach((el,index) =>{
                 const option = document.createElement("option");
@@ -196,3 +200,138 @@ import { showNotification } from "../Utilities/notification.js";
                 hideAddModuleModal();
             }
         });
+
+
+
+// Get new elements
+const addCourseBtn = document.getElementById('add-course-btn');
+const removeCourseBtn = document.getElementById('remove-course-btn');
+const addCourseModal = document.getElementById('add-course-modal');
+const courseForm = document.getElementById('course-form');
+const cancelCourseAddBtn = document.getElementById('cancel-course-add');
+const closeCourseModalBtn = addCourseModal.querySelector('.close-button');
+
+// Event Listeners for course management
+addCourseBtn.addEventListener('click', () => {
+    showLoading();
+    setTimeout(() => {
+        showAddCourseModal();
+        hideLoading();
+    }, 1000);
+});
+
+removeCourseBtn.addEventListener('click', () => {
+    showLoading();
+    setTimeout(() => {
+        removeSelectedCourse();
+        hideLoading();
+    }, 1000);
+});
+
+courseForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    showLoading();
+    setTimeout(() => {
+        addNewCourse();
+        hideLoading();
+    }, 1000);
+});
+
+cancelCourseAddBtn.addEventListener('click', () => {
+    showLoading();
+    setTimeout(() => {
+        hideAddCourseModal();
+        hideLoading();
+    }, 1000);
+});
+
+closeCourseModalBtn.addEventListener('click', () => {
+    showLoading();
+    setTimeout(() => {
+        hideAddCourseModal();
+        hideLoading();
+    }, 1000);
+});
+
+// Course Management Functions
+function showAddCourseModal() {
+    addCourseModal.style.display = 'flex';
+}
+
+function hideAddCourseModal() {
+    addCourseModal.style.display = 'none';
+    courseForm.reset();
+}
+
+async function addNewCourse() {
+    const title = document.getElementById('course-title').value.trim();
+    
+    if (!title) {
+        showNotification('Please enter a course title', 'error');
+        return;
+    }
+    
+    try {
+        // Add to both collections
+        showLoading();
+       const response = await addCourse(title);
+       setTimeout(() => {
+            hideLoading();
+       }, 2000);
+
+        if (response) {
+            // Refresh the course list
+            courseSelect.innerHTML = '<option value="">-- Select a Course --</option>'
+            showCourseList();
+            hideAddCourseModal();
+            showNotification('Course added successfully!', 'success');
+        } else {
+            throw new Error(result.message || 'Failed to add course');
+        }
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
+}
+
+async function removeSelectedCourse() {
+    const courseId = courseSelect.value;
+    
+    if (!courseId) {
+        showNotification('Please select a course first', 'info');
+        return;
+    }
+    
+    const courses = await GetCourseList();
+    const courseTitle = courses.result[courseId].title;
+    
+    if (confirm(`Are you sure you want to remove "${courseTitle}" and all its modules/quizzes?`)) {
+        try {
+            showLoading();
+            const response = await removeCourse(courseTitle);
+            setTimeout(() => {
+            hideLoading();
+            }, 2000);
+            if (response) {
+                courseSelect.innerHTML = '<option value="">-- Select a Course --</option>'
+                showCourseList();
+                moduleList.innerHTML = '<div class="placeholder-message"><p>Select a course to view or manage its modules.</p></div>';
+                
+                showNotification('Course removed successfully!', 'success');
+            } else {
+                throw new Error(result.message || 'Failed to remove course');
+            }
+        } catch (error) {
+            showNotification(error.message, 'error');
+        }
+    }
+}
+
+// Close modal when clicking outside
+window.addEventListener('click', (e) => {
+    if (e.target === addCourseModal) {
+        hideAddCourseModal();
+    }
+    if (e.target === addModuleModal) {
+        hideAddModuleModal();
+    }
+});

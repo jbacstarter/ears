@@ -252,6 +252,17 @@
 }
 .li-quiz:hover{
 cursor: pointer;
+}       
+/* Add to your existing styles */
+.course-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Modal styles for course modal (similar to module modal) */
+#add-course-modal .modal-content {
+    max-width: 500px;
 }
     </style>
 </head>
@@ -274,8 +285,12 @@ cursor: pointer;
 
         <section id="content-area">
             <div class="course-management">
-                <h2>Course Module Management</h2>
                 
+                <h2>Course Module Management</h2>
+                <div class="course-actions" style="margin-bottom: 1rem;">
+    <button class="action-button add-button" id="add-course-btn">Add Course</button>
+    <button class="action-button remove-button" id="remove-course-btn">Remove Selected Course</button>
+</div>
                 <div class="course-selector">
                     <label for="course-select">Select Course:</label>
                     <select id="course-select">
@@ -328,6 +343,24 @@ cursor: pointer;
     </div>
     </div>
     <div id="notificationContainer" class="notification-container"></div>
+    <div class="modal" id="add-course-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add New Course</h2>
+            <button class="close-button">&times;</button>
+        </div>
+        <form id="course-form">
+            <div class="form-group">
+                <label for="course-title">Course Title:</label>
+                <input type="text" id="course-title" required>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="action-button cancel-button" id="cancel-course-add">Cancel</button>
+                <button type="submit" class="action-button submit-button">Add Course</button>
+            </div>
+        </form>
+    </div>
+</div>
     <script type="module" src="./adm.js"></script>
 </body>
 </html>
